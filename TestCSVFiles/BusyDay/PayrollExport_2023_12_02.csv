@@ -1,0 +1,13 @@
+Employee,Job Title,Regular Hours,Overtime Hours,Hourly Rate,Regular Pay,Overtime Pay,Total Pay,Net Sales,Declared Tips,Non-Cash Tips,Total Tips,Tips Withheld,Total Gratuity,Employee ID,Job Code,Location,Location Code
+"Costa, Rafael",Dishwasher,3.0,0.0,17.00,51.00,0.00,51.00,0.00,,0.00,0.00,0.00,0.00,,Boh,185 Chelmsford Street,
+"DaSilva-Pereira, Danilo",Dishwasher,9.24,0.0,17.00,157.08,0.00,157.08,0.00,,0.00,0.00,0.00,0.00,,Boh,185 Chelmsford Street,
+"Dominguez, Christopher",Expo,6.54,0.0,6.75,44.14,0.00,44.14,659.55,,0.00,0.00,0.00,0.00,,,185 Chelmsford Street,
+"Farrell, Alexandra",Server,6.77,0.0,6.75,45.70,0.00,45.70,1142.30,,252.00,252.00,0.00,0.00,,,185 Chelmsford Street,
+"Herbert, Colin",Cook,8.04,0.0,22.00,176.88,0.00,176.88,0.00,,0.00,0.00,0.00,0.00,,,185 Chelmsford Street,
+"Martin, Nelly",Cook,7.83,0.0,20.00,156.60,0.00,156.60,0.00,,0.00,0.00,0.00,0.00,,,185 Chelmsford Street,
+"Mousseau, Jeffrey",Bartender,7.27,0.0,7.00,50.89,0.00,50.89,1636.80,,349.25,349.25,0.00,0.00,,,185 Chelmsford Street,
+"Munoz, Yasmin",Server,5.71,0.0,6.75,38.54,0.00,38.54,1024.25,,179.33,179.33,0.00,0.00,,,185 Chelmsford Street,
+"Straitiff, Shaunessy",Server,5.41,0.0,6.75,36.52,0.00,36.52,700.85,,130.00,130.00,0.00,0.00,,,185 Chelmsford Street,
+"Tangarife, Ana",Dishwasher,8.41,0.0,18.00,151.38,0.00,151.38,0.00,,0.00,0.00,0.00,0.00,,Boh,185 Chelmsford Street,
+"Taylor, Taginie",Cook,8.52,0.0,21.00,178.92,0.00,178.92,0.00,,0.00,0.00,0.00,0.00,,,185 Chelmsford Street,
+"Tounvann, Sothearavisal",Server,4.55,0.0,6.75,30.71,0.00,30.71,639.65,,33.00,33.00,0.00,83.74,,,185 Chelmsford Street,

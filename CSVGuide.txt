@@ -1,0 +1,21 @@
+"Day of week (totals).csv"
+    - netSales
+    - guestCount
+    - currDay
+
+"Discount summary.csv"
+    - totalDiscounts
+
+"Payments summary.csv"
+    - doordashSales
+    - grubhubSales
+
+"Revenue center summary.csv"
+    - takeoutSales
+
+"Sales category summary.csv"
+    - foodSales
+    - barSales 
+
+"Time of day (totals).csv"
+    - hourlySalesOrdersGuest
