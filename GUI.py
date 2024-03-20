@@ -85,7 +85,8 @@ try:
                 encapsulated_data = DRW.create_ecapsulated_data(csv_folder_path, excel_folder_path)
                 curr_shift = Shift(encapsulated_data)
             except Exception as e:
-                DL.logger.error("ERROR: Failed to read CSV files. Exception:", e)
+                DL.logger.error("ERROR: Failed to read CSV files")
+                DL.logger.exception(e)
                 
             try:
                 curr_shift.print_member_variables()
@@ -98,7 +99,10 @@ try:
                     save_shift_file(curr_shift)
                 
             except Exception as e:
-                DL.logger.error("ERROR: Failed to print shift details! Exception:", e)
+                DL.logger.error("ERROR: Failed to print shift details! Exception:")
+                DL.logger.exception(e)
+                
+            Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
                 
         elif event == "Generate Report":
             DL.logger.error("ERROR: Missing required file path(s)!")
@@ -111,7 +115,7 @@ try:
             DRW.write_config(config)
             
 except Exception as e:
-    DL.logger.critical("Exception:", e)
+    DL.logger.exception(e)
     DL.logger.critical("-= Closing window in 20 seconds! =-")
     time.sleep(20)
 

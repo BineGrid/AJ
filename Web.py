@@ -15,6 +15,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 import DevScreenControl as DSC
 from DevScreenControl import ShiftField as SF
+from Shift import Shift
 
 with open('config.json') as f:
   config = json.load(f)
@@ -203,26 +204,62 @@ class ShiftNote:
         # Click Login
         driver.find_element(By.NAME, "Submit").click()
         
-    def enter_daily(sales, for_sales, g_count, takeout, angel_share = 0):
-        bring_to_front()
-        DSC.enter_shiftnote_field(SF.Numeric.Sales, sales)
+    def enter_daily(sales, for_sales, g_count, takeout, angel_share = None):
+        #bring_to_front()
+        if sales is not None:
+            DSC.enter_shiftnote_field(SF.Numeric.Sales, sales)
+            
+        if for_sales is not None:
+            DSC.enter_shiftnote_field(SF.Numeric.For_Sales, for_sales)
+            
+        if sales is not None:
+            DSC.enter_shiftnote_field(SF.Numeric.Guest_Count, g_count)
+            
+        if takeout is not None:
+            DSC.enter_shiftnote_field(SF.Numeric.Takeout, takeout)
+            
+        if angel_share is not None:
+            DSC.enter_shiftnote_field(SF.Numeric.Angel_Share, angel_share)
+            
+        #driver.find_element(By.ID, "submit1").click()
+            
+    def enter_labor(FOH_P, FOH_A, BOH_P, BOH_A):
+        scroll_to_element(By.ID, "Category186036")
+        DSC.enter_shiftnote_field(SF.Numeric.BOH_Lab_For, BOH_P)
+        DSC.enter_shiftnote_field(SF.Numeric.BOH_Lab_Act, BOH_A)
+        DSC.enter_shiftnote_field(SF.Numeric.FOH_Lab_For, FOH_P)
+        DSC.enter_shiftnote_field(SF.Numeric.FOH_Lab_Act, FOH_A)
+        #driver.find_element(By.ID, "submit1").click()
+        
+    def enter_sales_labor(text: str):
+        scroll_to_element(By.ID, "Category186034")
+        DSC.enter_shiftnote_field(SF.Input.Sales_and_Lab, text)
         
     def enter_business_flow(text: str):
-        bring_to_front()
+        #bring_to_front()
+        scroll_to_element(By.ID, "Category186038")
         DSC.enter_shiftnote_field(SF.Input.Business_Flow, text)
         
     def enter_staffing(text: str):
-        bring_to_front()
+        #bring_to_front()
         scroll_to_element(By.ID, "Category186043")
         DSC.enter_shiftnote_field(SF.Input.Staffing_Levels, text)
         scroll_to_element(By.ID, "Category186043")
         #driver.find_element(By.ID, "savebtn").click()
+        
+    def enter_shift(self, shift: Shift):
+        switch_tab_url(Tabs.SHIFTNOTE, config["SHIFTREPORT_URL"])
+        bring_to_front()
+        self.enter_daily(str(shift.netSales), str(shift.ProjSales), str(shift.guestCount), str(shift.takeoutSales))
+        self.enter_labor(str(shift.ProjFOHLabor), str(shift.ActFOHLabor), str(shift.ProjBOHLabor), str(shift.ActBOHLabor))
+        self.enter_sales_labor(shift.get_sales_proj_vs_act_perc())
 
 # Test stuff
 #switch_tab_url(Tabs.TOAST, config["TOASTHOME_URL"])
-switch_tab_url(Tabs.SHIFTNOTE, config["SHIFTREPORT_URL"])
+#switch_tab_url(Tabs.SHIFTNOTE, config["SHIFTREPORT_URL"])
 
-#ShiftNote.enter_business_flow("test")
-ShiftNote.enter_daily("400", 0, 0, 0)
-time.sleep(10)
+#ShiftNote.enter_daily("100", "200", "300", "400", "500")
+#ShiftNote.enter_labor("600", "700", "800", "900")
+#ShiftNote.enter_sales_labor("test")
+#time.sleep(10)
 

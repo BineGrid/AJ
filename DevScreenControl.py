@@ -6,35 +6,33 @@ import DevLogger as DL
 
 class ShiftField:
     '''
-        All the Shiftnote input fields enumerated for with there image name for convenience
+        All the Shiftnote input fields enumerated with there image name for convenience
     '''
     class Numeric:
         Sales = "Sales.png"
         For_Sales = "ForecastedSales.png"
-        Guest_Count = "Guest Count"
-        Angel_Share = "Angel Share"
-        Takeout = "Takeout"
-        BOH_Lab_For = "BOH Labor Forecast"
-        BOH_Lab_Act = "BOH Labor Actual"
-        FOH_Lab_For = "FOH Labor Forecast"
-        FOH_Lab_Act = "FOH Labor Actual"
+        Guest_Count = "GuestCount.png"
+        Angel_Share = "AngelShare.png"
+        Takeout = "Takeout.png"
+        BOH_Lab_For = "BOHLaborForecast.png"
+        BOH_Lab_Act = "BOHLaborActual.png"
+        FOH_Lab_For = "FOHLaborForecast.png"
+        FOH_Lab_Act = "FOHLaborActual.png"
         
     class Input:
         Sales_and_Lab = "SalesLabor.png"
-        Specials = "Specials"
-        Training = "Training"
-        Tardiness_Call_Outs = "Tardiness/Call-Outs"
+        Specials = "Specials.png"
+        Training = "Training.png"
+        Tardiness_Call_Outs = "TardinessCallOuts.png"
         Staffing_Levels = "StaffingLevels.png"
         Business_Flow = "BusinessFlow.png"
-        Item_86d = "86'd"
-
-    
+        Item_86d = "86d.png"
 
 with open('config.json') as f:
   config = json.load(f)
   
 # Function to scroll down until a specific color is found
-def find_image_move_until_color_found(image, color, y_move=0, x_move=0):
+def find_image_move_until_color_found(image, color, x_move=0, y_move=0):
     '''
         This will find the center coords of an image on screen, then move either up or down
         from that point until it finds the desired (R, G, B) color, then click that point
@@ -56,10 +54,11 @@ def find_image_move_until_color_found(image, color, y_move=0, x_move=0):
         DL.logger.error(f"Image: {image} with a confidene of {config["image_click_confidence"]}, was not found on the screen!")
         DL.logger.exception(e)
         
-    DL.logger.debug(f"Image: {image}, Found at ({x},{y})")
+    DL.logger.debug(f"Image: {image}, Found at ({int(x)},{int(y)})")
     
-    # Scroll down until the desired color is found
+    # Scroll until the desired color is found
     while True:
+        pyautogui.moveTo(x, y)
         # Check the color of the pixel at the current location
         pixel_color = pyautogui.pixel(int(x), int(y))
         if pixel_color == color:
@@ -80,15 +79,17 @@ def click_image(image, x_offset=0, y_offset=0):
         DL.logger.exception(e)
     
 def enter_shiftnote_field(field: ShiftField, input: str):
-    x = y = 0
+    x = 0 
+    y = 0
     if(field in vars(ShiftField.Input).values()):
-        y = -5
+        y = -20
     elif(field in vars(ShiftField.Numeric).values()):
-        x = -5
+        x = 50
     else:
         DL.logger.error(f"ERROR: Field {field} is not supported")
         
     find_image_move_until_color_found(field, (255, 255, 255), x, y)
+    time.sleep(0.2)
     pyautogui.write(input) 
     
 #enter_business_flow("test")
