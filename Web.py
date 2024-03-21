@@ -14,7 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 import DevScreenControl as DSC
-from DevScreenControl import ShiftField as SF
+from DevScreenControl import ShiftField as SF, ToastButton
 from Shift import Shift
 
 with open('config.json') as f:
@@ -36,8 +36,8 @@ options = webdriver.ChromeOptions()
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
 # Sets the download dir
-prefs = {"download.default_directory": config["temp_dir"]}
-options.add_experimental_option("prefs", prefs)
+#prefs = {"download.default_directory": config["temp_dir"]}
+#options.add_experimental_option("prefs", prefs)
 
 # Add options to disable download protection
 options.add_argument('--safebrowsing-disable-download-protection')
@@ -178,6 +178,17 @@ class Toast:
         passwd.send_keys(config["TOASTPASS"])
         # Click Login
         driver.find_element(By.NAME, "action").click()
+        
+    def download_sales_summary():
+        switch_tab_url(Tabs.TOAST, config["TOASTHOME_URL"])
+        switch_tab_url(Tabs.TOAST, config["TOASTSALES_URL"])
+        driver.find_element(By.ID, "dropdown-20").click()
+        DSC.click_image(ToastButton.CSV_Download)
+        
+    def download_payroll_export():
+        switch_tab_url(Tabs.TOAST, config["TOASTLABOR_URL"])
+        driver.find_element(By.ID, "payroll-export").click()
+
 
 class ShiftNote:
     '''
@@ -262,4 +273,8 @@ class ShiftNote:
 #ShiftNote.enter_labor("600", "700", "800", "900")
 #ShiftNote.enter_sales_labor("test")
 #time.sleep(10)
+
+Toast.download_sales_summary()
+Toast.download_payroll_export()
+time.sleep(10)
 

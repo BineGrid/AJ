@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 import DevLogger as DL
 import DevData as DD
 
@@ -74,6 +75,19 @@ def create_ecapsulated_data(csv_folder_path, excel_folder_path) -> DD.DCArray:
         DL.logger.error("ERROR: Failed to process CSV files. Exception:", e)
         
     return encapsulated_data
+
+def get_newest_file(dir: str):
+    return sorted(Path(dir).iterdir(), key=os.path.getmtime)[-1]
+
+def unzip_sales_summary(dir: str):
+    last_download = get_newest_file(dir)
+    if(last_download.startswith(config["sales_summary_name"])):
+        pass
+    else:
+        DL.logger.error(f"ERROR: No CSV files found in dir: {dir}")
+    print(last_download)
+    
+unzip_sales_summary(config["download_dir"])
                         
             
 

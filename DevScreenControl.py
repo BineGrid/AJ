@@ -27,6 +27,9 @@ class ShiftField:
         Staffing_Levels = "StaffingLevels.png"
         Business_Flow = "BusinessFlow.png"
         Item_86d = "86d.png"
+        
+class ToastButton:
+    CSV_Download = "DownloadCSVFiles.png"
 
 with open('config.json') as f:
   config = json.load(f)
