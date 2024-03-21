@@ -27,24 +27,30 @@ class Tabs:
     TOAST = "toast"
     SHIFTNOTE = "shift"
     UNKOWN_TAB = "unkown"
+    
+driver = None
 
-# Opens Chrome and initializes the driver
-driver = webdriver.Chrome()
+def init_chrome():
+    '''
+        You must call this before performing any web activities
+    '''
+    # Opens Chrome and initializes the driver
+    driver = webdriver.Chrome()
+    
+    # This disables pointless error print outs from Selenium
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-# This disables pointless error print outs from Selenium
-options = webdriver.ChromeOptions()
-options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    # Sets the download dir
+    #prefs = {"download.default_directory": config["temp_dir"]}
+    #options.add_experimental_option("prefs", prefs)
 
-# Sets the download dir
-#prefs = {"download.default_directory": config["temp_dir"]}
-#options.add_experimental_option("prefs", prefs)
+    # Add options to disable download protection
+    options.add_argument('--safebrowsing-disable-download-protection')
 
-# Add options to disable download protection
-options.add_argument('--safebrowsing-disable-download-protection')
-
-# Opens Chrome and initializes the driver
-driver = webdriver.Chrome(options=options)
-driver.maximize_window()
+    # Opens Chrome and initializes the driver
+    driver = webdriver.Chrome(options=options)
+    driver.maximize_window()
 
 def bring_to_front():
     '''
@@ -274,7 +280,7 @@ class ShiftNote:
 #ShiftNote.enter_sales_labor("test")
 #time.sleep(10)
 
-Toast.download_sales_summary()
-Toast.download_payroll_export()
-time.sleep(10)
+#Toast.download_sales_summary()
+#Toast.download_payroll_export()
+#time.sleep(10)
 

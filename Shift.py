@@ -20,7 +20,10 @@ class Shift:
         self.guestCount = encapsulated_data.read_by_sign(f"Day of week (totals)-{self.currDay}-Total guests")
         
         # -= Sales =-
-        self.ProjSales = encapsulated_data.read_by_sign(f"S&L-NET Sales Projection-{self.currDay.upper()}")[0] # We always get two of these, but I only want one lol
+        self.ProjSales = encapsulated_data.read_by_sign(f"S&L-NET Sales Projection-{self.currDay.upper()}")
+        if isinstance(self.ProjSales, list):
+            self.ProjSales = self.ProjSales[0] # We always get two of these, but I only want one lol
+            
         self.netSales = encapsulated_data.read_by_sign(f"Day of week (totals)-{self.currDay}-Net sales")
         self.takeoutSales = encapsulated_data.read_by_sign("Revenue center summary-Take Out-Net sales")
         self.doordashSales = encapsulated_data.read_by_sign("Payments summary-Door Dash-Amount")
@@ -162,7 +165,7 @@ class Shift:
         result_string = ""
         
         for count, job in self.PresentJobCount_List:
-            result_string += f"{count} {job}\n"
+            result_string += f"{job} {count}/X Perfect\n"
         
         return result_string
 

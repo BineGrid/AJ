@@ -22,11 +22,11 @@ input_layout = [
     [sg.Text("Please be sure to unzip the files!"), sg.Push(), sg.Checkbox("Delete Temp Files", key='delete')],
     [sg.Button('Open Chrome Tabs', key="-WEB-"),sg.Push(),sg.Checkbox("Save Reports", key='save')],
     [
-        sg.FolderBrowse(button_text="CSV Folder", key="-CSVFOLDER-", enable_events=True, size=(8, 2)),
-        sg.InputText(config["last_CSV_path"], key="-CSVFOLDER_TEXT-", size=(98, 1)),
+        sg.FolderBrowse(button_text="Dwnld Folder", enable_events=True, size=(10, 2)),
+        sg.InputText(config["download_dir"], key="-DLFOLDER_TEXT-", size=(98, 1)),
     ],
     [
-        sg.FolderBrowse(button_text="Excl Folder", key="-EXCELFOLDER-", enable_events=True, size=(8, 2)),
+        sg.FileBrowse(button_text="S&L File", enable_events=True, size=(10, 2)),
         sg.InputText(config["last_excel_path"], key="-EXCELFOLDER_TEXT-", size=(98, 1)),
     ],
     [
@@ -42,8 +42,8 @@ curr_shift = None
 csv_arr = []
 
 # Load in default checkbox value from config
-csv_folder_path = config["last_CSV_path"]
-excel_folder_path = config["last_excel_path"]
+sales_labor_path = config["last_excel_path"]
+download_path = config["download_dir"]
 
 window["save"].update(config["save_reports"])
 window["delete"].update(config["delete_temp_files"])
@@ -73,16 +73,16 @@ try:
         if event == "Open Config":
             os.startfile("config.json")
             
-        if event == "Generate Report" and values["-CSVFOLDER_TEXT-"] and values["-EXCELFOLDER_TEXT-"]:
+        if event == "Generate Report" and values["-DLFOLDER_TEXT-"] and values["-EXCELFOLDER_TEXT-"]:
             DL.logger.info("\n   - Generating Report -")
-            config["last_CSV_path"] = csv_folder_path = values["-CSVFOLDER_TEXT-"]  # Use -CSVFOLDER_TEXT- to get the value
-            config["last_excel_path"] = excel_folder_path = values["-EXCELFOLDER_TEXT-"]  # Use -EXCELFOLDER_TEXT- to get the value
+            config["download_dir"] = download_dir = values["-DLFOLDER_TEXT-"]  # Use -CSVFOLDER_TEXT- to get the value
+            config["last_excel_path"] = sales_labor_path = values["-EXCELFOLDER_TEXT-"]  # Use -EXCELFOLDER_TEXT- to get the value
             config["save_reports"] = values["save"]
             config["delete_temp_files"] = values["delete"]
             DRW.write_config(config)
         
             try:
-                encapsulated_data = DRW.create_ecapsulated_data(csv_folder_path, excel_folder_path)
+                encapsulated_data = DRW.create_ecapsulated_data(config["temp_dir"], sales_labor_path)
                 curr_shift = Shift(encapsulated_data)
             except Exception as e:
                 DL.logger.error("ERROR: Failed to read CSV files")
@@ -102,14 +102,14 @@ try:
                 DL.logger.error("ERROR: Failed to print shift details! Exception:")
                 DL.logger.exception(e)
                 
-            Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
+            #Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
                 
         elif event == "Generate Report":
             DL.logger.error("ERROR: Missing required file path(s)!")
 
         if event == sg.WIN_CLOSED:
-            config["last_CSV_path"] = csv_folder_path = values["-CSVFOLDER_TEXT-"]  # Use -CSVFOLDER_TEXT- to get the value
-            config["last_excel_path"] = excel_folder_path = values["-EXCELFOLDER_TEXT-"]  # Use -EXCELFOLDER_TEXT- to get the value
+            config["download_dir"] = download_path = values["-DLFOLDER_TEXT-"]  # Use -CSVFOLDER_TEXT- to get the value
+            config["last_excel_path"] = sales_labor_path = values["-EXCELFOLDER_TEXT-"]  # Use -EXCELFOLDER_TEXT- to get the value
             config["save_reports"] = values["save"]
             config["delete_temp_files"] = values["delete"]
             DRW.write_config(config)
