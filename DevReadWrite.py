@@ -112,7 +112,7 @@ def unzip_sales_summary(dir: str, delete = config["delete_temp_files"]):
         
         # Delete download
         if delete:
-            os.remove(config["download_dir"] + last_download)
+            os.remove(os.path.join(config["download_dir"], last_download))
         else:    
             DL.logger.error(f"ERROR: No CSV files found in dir: {dir}")
         print("Last Download:", last_download)
@@ -121,8 +121,13 @@ def unzip_sales_summary(dir: str, delete = config["delete_temp_files"]):
         DL.logger.critical("ERROR: Failed unzip CSV files!")
         DL.logger.exception(e)
         
+def delete_everything_in_dir(dir: str):
+    for file in os.listdir(dir):
+        os.remove(os.path.join(dir, file))
+    
 #unzip_sales_summary(config["download_dir"])
-rellocate_payroll_csv(config["download_dir"])
+#rellocate_payroll_csv(config["download_dir"])
+
                         
             
 

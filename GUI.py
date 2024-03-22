@@ -75,15 +75,29 @@ try:
             
         if event == "Generate Report" and values["-DLFOLDER_TEXT-"] and values["-EXCELFOLDER_TEXT-"]:
             DL.logger.info("\n   - Generating Report -")
-            config["download_dir"] = download_dir = values["-DLFOLDER_TEXT-"]  # Use -CSVFOLDER_TEXT- to get the value
+            config["download_dir"] = download_dir = values["-DLFOLDER_TEXT-"]  # Use -DLFOLDER_TEXT- to get the value
             config["last_excel_path"] = sales_labor_path = values["-EXCELFOLDER_TEXT-"]  # Use -EXCELFOLDER_TEXT- to get the value
             config["save_reports"] = values["save"]
             config["delete_temp_files"] = values["delete"]
             DRW.write_config(config)
         
             try:
+                Web.init_chrome()
+                Web.Toast.download_sales_summary()
+                DRW.unzip_sales_summary(config["download_dir"])
+                Web.Toast.download_payroll_export()
+                DRW.rellocate_payroll_csv(config["download_dir"])
+            except Exception as e:
+                DL.logger.critical("ERROR: Failed to download the csv files from toast!")
+                DL.logger.exception(e)
+        
+            try:
                 encapsulated_data = DRW.create_ecapsulated_data(config["temp_dir"], sales_labor_path)
                 curr_shift = Shift(encapsulated_data)
+                
+                if config["delete_temp_files"]:
+                    DRW.delete_everything_in_dir(config["temp_dir"])
+                    
             except Exception as e:
                 DL.logger.error("ERROR: Failed to read CSV files")
                 DL.logger.exception(e)
@@ -116,8 +130,8 @@ try:
             
 except Exception as e:
     DL.logger.exception(e)
-    DL.logger.critical("-= Closing window in 20 seconds! =-")
-    time.sleep(20)
+    DL.logger.critical("-= Closing window in 10 seconds! =-")
+    time.sleep(10)
 
 # Close the window
 window.close()

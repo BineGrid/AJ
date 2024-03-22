@@ -85,9 +85,9 @@ def enter_shiftnote_field(field: ShiftField, input: str):
     x = 0 
     y = 0
     if(field in vars(ShiftField.Input).values()):
-        y = -20
+        y = -15
     elif(field in vars(ShiftField.Numeric).values()):
-        x = 50
+        x = 30
     else:
         DL.logger.error(f"ERROR: Field {field} is not supported")
         

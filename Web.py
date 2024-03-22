@@ -35,15 +35,12 @@ def init_chrome():
         You must call this before performing any web activities
     '''
     # Opens Chrome and initializes the driver
+    global driver
     driver = webdriver.Chrome()
     
     # This disables pointless error print outs from Selenium
     options = webdriver.ChromeOptions()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
-
-    # Sets the download dir
-    #prefs = {"download.default_directory": config["temp_dir"]}
-    #options.add_experimental_option("prefs", prefs)
 
     # Add options to disable download protection
     options.add_argument('--safebrowsing-disable-download-protection')
@@ -189,12 +186,19 @@ class Toast:
         switch_tab_url(Tabs.TOAST, config["TOASTHOME_URL"])
         switch_tab_url(Tabs.TOAST, config["TOASTSALES_URL"])
         driver.find_element(By.ID, "dropdown-20").click()
+        time.sleep(0.1)
         DSC.click_image(ToastButton.CSV_Download)
+        time.sleep(config["DEFAULT_DOWNLOAD_WAIT"])
         
     def download_payroll_export():
         switch_tab_url(Tabs.TOAST, config["TOASTLABOR_URL"])
         driver.find_element(By.ID, "payroll-export").click()
-
+        time.sleep(config["DEFAULT_DOWNLOAD_WAIT"])
+        
+    def download_everything(self):
+        bring_to_front()
+        self.download_sales_summary()
+        self.download_payroll_export()
 
 class ShiftNote:
     '''
@@ -222,7 +226,6 @@ class ShiftNote:
         driver.find_element(By.NAME, "Submit").click()
         
     def enter_daily(sales, for_sales, g_count, takeout, angel_share = None):
-        #bring_to_front()
         if sales is not None:
             DSC.enter_shiftnote_field(SF.Numeric.Sales, sales)
             
@@ -251,11 +254,13 @@ class ShiftNote:
     def enter_sales_labor(text: str):
         scroll_to_element(By.ID, "Category186034")
         DSC.enter_shiftnote_field(SF.Input.Sales_and_Lab, text)
+        #driver.find_element(By.ID, "savebtn").click()
         
     def enter_business_flow(text: str):
         #bring_to_front()
         scroll_to_element(By.ID, "Category186038")
         DSC.enter_shiftnote_field(SF.Input.Business_Flow, text)
+        #driver.find_element(By.ID, "savebtn").click()
         
     def enter_staffing(text: str):
         #bring_to_front()
