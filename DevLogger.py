@@ -19,6 +19,9 @@ logging.basicConfig(level=config["debug_level"])
     #filename=log_file,
     #filemode='w'
 
+# This is the actually just a regular python logger with a custom handler
+# Since I needed to add a custom handler to it I wanted to put it in one place
+# and then have all my code reference it here
 logger = logging.getLogger(__name__)
 logger.addHandler(GUITextHandler())
     

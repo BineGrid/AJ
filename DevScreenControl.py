@@ -72,6 +72,9 @@ def find_image_move_until_color_found(image, color, x_move=0, y_move=0):
         x += x_move
 
 def click_image(image, x_offset=0, y_offset=0):
+    '''
+        This will click the center of an imagine on screen
+    '''
     image_path = os.path.join(config["images_path"], image)
     try:
         x, y = pyautogui.locateCenterOnScreen(image_path, confidence=config["image_click_confidence"])
@@ -82,6 +85,11 @@ def click_image(image, x_offset=0, y_offset=0):
         DL.logger.exception(e)
     
 def enter_shiftnote_field(field: ShiftField, input: str):
+    '''
+        This takes in a Shiftfield which corresponds to the image associated with it
+        
+        Then using the image we can determine where is on screen and click the new entree button
+    '''
     x = 0 
     y = 0
     if(field in vars(ShiftField.Input).values()):
@@ -94,5 +102,3 @@ def enter_shiftnote_field(field: ShiftField, input: str):
     find_image_move_until_color_found(field, (255, 255, 255), x, y)
     time.sleep(0.2)
     pyautogui.write(input) 
-    
-#enter_business_flow("test")

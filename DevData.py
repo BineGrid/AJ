@@ -4,6 +4,9 @@ import numpy as np
 from pandas import DataFrame as df
 
 class NamedDataFrame:
+    '''
+        Added a name var to the pandas dataframe
+    '''
     def __init__(self, file_path: str, dataframe: df):
         self.folder_path, self.file_name = os.path.split(file_path)
         self.dataframe = dataframe
@@ -104,6 +107,12 @@ class DataCell:
         return self.df.iat[self.row_index, self.col_index]
     
     def write(self, value):
+        '''
+            WARNING this does not work with excel files yet!
+            TODO make this work with excel 
+            
+            This writes to a single DataCell and updates the actual file
+        '''
         self.df.iat[self.row_index, self.col_index] = value
         
         # Save the modified DataFrame back to the file

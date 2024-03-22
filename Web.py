@@ -172,7 +172,7 @@ class Toast:
         # This checks if there is a captcha (sometimes there just isn't one, idk why)
         # If there is a captcha increase the wait time to account for the user pressing the captcha
         if (check_element_exists(By.ID, "ulp-recaptcha")):
-            # TODO Change this
+            # TODO Fix the captcha detection thingy
             #AJGui.createPopUpMsg("Please press the im not a robot check box\nThen press continue", "Help!")
             # Finds Password input
             passwd = userWait.until(
@@ -186,6 +186,9 @@ class Toast:
         driver.find_element(By.NAME, "action").click()
         
     def download_sales_summary():
+        '''
+            Switch to the payment summary url on the toast tab and download all the csv files
+        '''
         switch_tab_url(Tabs.TOAST, config["TOASTHOME_URL"])
         switch_tab_url(Tabs.TOAST, config["TOASTSALES_URL"])
         driver.find_element(By.ID, "dropdown-20").click()
@@ -194,11 +197,17 @@ class Toast:
         time.sleep(config["DEFAULT_DOWNLOAD_WAIT"])
         
     def download_payroll_export():
+        '''
+            Switch to the payroll url on the toast tab an download the export
+        '''
         switch_tab_url(Tabs.TOAST, config["TOASTLABOR_URL"])
         driver.find_element(By.ID, "payroll-export").click()
         time.sleep(config["DEFAULT_DOWNLOAD_WAIT"])
         
     def download_everything(self):
+        '''
+            Download ALL the files that we may need from toast
+        '''
         bring_to_front()
         self.download_sales_summary()
         self.download_payroll_export()
@@ -247,7 +256,7 @@ class ShiftNote:
         #driver.find_element(By.ID, "submit1").click()
             
     def enter_labor(FOH_P, FOH_A, BOH_P, BOH_A):
-        scroll_to_element(By.ID, "Category186036")
+        scroll_to_element(By.ID, config["SHIFT_SALES_LABOR_ID"])
         DSC.enter_shiftnote_field(SF.Numeric.BOH_Lab_For, BOH_P)
         DSC.enter_shiftnote_field(SF.Numeric.BOH_Lab_Act, BOH_A)
         DSC.enter_shiftnote_field(SF.Numeric.FOH_Lab_For, FOH_P)
@@ -255,40 +264,29 @@ class ShiftNote:
         #driver.find_element(By.ID, "submit1").click()
         
     def enter_sales_labor(text: str):
-        scroll_to_element(By.ID, "Category186034")
+        scroll_to_element(By.ID, config["SHIFT_MARKETING_ID"])
         DSC.enter_shiftnote_field(SF.Input.Sales_and_Lab, text)
         #driver.find_element(By.ID, "savebtn").click()
         
     def enter_business_flow(text: str):
-        #bring_to_front()
-        scroll_to_element(By.ID, "Category186038")
+        scroll_to_element(By.ID, config["SHIFT_BUSINESS_FLOW_ID"])
         DSC.enter_shiftnote_field(SF.Input.Business_Flow, text)
         #driver.find_element(By.ID, "savebtn").click()
         
-    def enter_staffing(text: str):
-        #bring_to_front()
-        scroll_to_element(By.ID, "Category186043")
+    def enter_staffing_levels(text: str):
+        scroll_to_element(By.ID, config["SHIFT_IMMEDIATE_STAFFING_ID"])
         DSC.enter_shiftnote_field(SF.Input.Staffing_Levels, text)
-        scroll_to_element(By.ID, "Category186043")
+        scroll_to_element(By.ID, config["SHIFT_IMMEDIATE_STAFFING_ID"])
         #driver.find_element(By.ID, "savebtn").click()
         
     def enter_shift(self, shift: Shift):
+        '''
+            Takes in a shift object and then uses all its data to input everything into Shiftnote
+        '''
         switch_tab_url(Tabs.SHIFTNOTE, config["SHIFTREPORT_URL"])
         bring_to_front()
         self.enter_daily(str(shift.netSales), str(shift.ProjSales), str(shift.guestCount), str(shift.takeoutSales))
         self.enter_labor(str(shift.ProjFOHLabor), str(shift.ActFOHLabor), str(shift.ProjBOHLabor), str(shift.ActBOHLabor))
         self.enter_sales_labor(shift.get_sales_proj_vs_act_perc())
 
-# Test stuff
-#switch_tab_url(Tabs.TOAST, config["TOASTHOME_URL"])
-#switch_tab_url(Tabs.SHIFTNOTE, config["SHIFTREPORT_URL"])
-
-#ShiftNote.enter_daily("100", "200", "300", "400", "500")
-#ShiftNote.enter_labor("600", "700", "800", "900")
-#ShiftNote.enter_sales_labor("test")
-#time.sleep(10)
-
-#Toast.download_sales_summary()
-#Toast.download_payroll_export()
-#time.sleep(10)
 

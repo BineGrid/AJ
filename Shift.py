@@ -136,6 +136,12 @@ class Shift:
         return result_string
     
     def get_sales_proj_vs_act_perc(self) -> str:
+        '''
+            This:\n
+            Sales Forecasted = $ Sales Actual = $ = $\n
+            FOH Labor Forecasted % vs FOH Labor Actual %\n
+            BOH Labor Forecasted % vs BOH Labor Actual %
+        '''
         result_string = f"Sales Forecasted = ${self.ProjSales} Sales Actual = ${self.netSales} = "
         
         # Figure out the difference between proj and act sales
@@ -155,12 +161,25 @@ class Shift:
         return result_string
     
     def get_sales_proj_vs_act_labor(self) -> str:
+        '''
+            This:\n
+            FOH P: $ A: $\n
+            BOH P: $ A: $
+        '''
         result_string = f"FOH  P: ${round(self.ProjFOHLabor, 2)}  -  A: ${round(self.ActFOHLabor, 2)}\n"
         result_string += f"BOH  P: ${round(self.ProjBOHLabor, 2)}  -  A: ${round(self.ActBOHLabor, 2)}\n"
         
         return result_string
     
     def get_present_job_title_count(self) -> str:
+        '''
+            This:\n
+                Bar 1/X Perfect\n
+                Server 3/X Perfect\n
+                Expo 1/X Perfect\n
+                Cook 3/X Perfect\n
+                Dish 1/X Perfect
+        '''
         
         result_string = ""
         
@@ -170,6 +189,12 @@ class Shift:
         return result_string
 
 def save_shift_file(shift: Shift):
+    '''
+        This will pickle a shift class and save it as a .shift file
+        It gaves it a name based on the date and time
+        
+        Ex: M-D-Y_HourMinSec
+    '''
     # Find current date and time to create the name of the file
     # datetime object containing current date and time
     now = datetime.now()
@@ -182,6 +207,9 @@ def save_shift_file(shift: Shift):
         pickle.dump(shift, f)
     
 def load_shift_file(file_path: str) -> Shift:
+    '''
+        This will unpickle a .shift file and return a shift object
+    '''
     with open(file_path, 'rb') as f:
         return pickle.load(f)
 
