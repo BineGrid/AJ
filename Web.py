@@ -159,6 +159,9 @@ class Toast:
         
         wait = WebDriverWait(driver, config["DEFAULT_LOADING_WAIT"])
         userWait = WebDriverWait(driver, 60)
+        
+        # Wait a little longer for page to load
+        time.sleep(5)
         # Finds User input
         user = wait.until(EC.presence_of_element_located((By.NAME, "username")))
         user.send_keys(config["TOASTUSER"])

@@ -103,6 +103,12 @@ try:
                 DL.logger.exception(e)
                 
             try:
+                Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
+            except Exception as e:
+                DL.logger.error("ERROR: Failed to input shift into ShiftNote")
+                DL.logger.exception(e)
+                
+            try:
                 curr_shift.print_member_variables()
                 print(curr_shift.get_hourly_report_str())
                 print(curr_shift.get_sales_proj_vs_act_perc())
