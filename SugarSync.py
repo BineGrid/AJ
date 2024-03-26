@@ -1,50 +1,113 @@
+import json
+from xml.dom.minidom import Element
 import requests
-import base64
+import xml.etree.ElementTree as ET
 
-# SugarSync API credentials
-API_KEY = 'ODkyNTQwMTY3Nzk4OTA5OTU0Mw'
-API_SECRET = 'NTFmZWM4MWY2NTM0NGFmNDhkZWY2YTFhZDliMWUwNjE'
 
-# Base64 encode the API key and secret
-credentials = base64.b64encode(f"{API_KEY}:{API_SECRET}".encode()).decode()
+# Load configuration from JSON file
+with open('config.json') as f:
+    config = json.load(f)
 
-# SugarSync API endpoints
-API_BASE_URL = 'https://api.sugarsync.com'
-AUTH_ENDPOINT = '/authorization'
-FOLDER_ENDPOINT = '/Folders'
+API_SAMPLE_USER_AGENT = "/Folders"
+APP_AUTH_REFRESH_TOKEN_API_URL = "https://api.sugarsync.com/app-authorization"
 
-def get_access_token():
-    # Make a POST request to authenticate and obtain access token
+def get_refresh_token(username, password, application, access_key, private_access_key):
+    # Construct the XML request payload
+    request_payload = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <appAuthorization>
+        <username>{username}</username>
+        <password>{password}</password>
+        <application>{application}</application>
+        <accessKeyId>{access_key}</accessKeyId>
+        <privateAccessKey>{private_access_key}</privateAccessKey>
+    </appAuthorization>"""
+
+    # Make a HTTP POST request to the app authorization API
     headers = {
-        'Authorization': f'Basic {credentials}',
-        'Content-Type': 'application/x-www-form-urlencoded'
+        "User-Agent": API_SAMPLE_USER_AGENT,
+        "Content-Type": "application/xml"
     }
-    data = {
-        'grant_type': 'password',
-        'username': 'info@moonstones110.com',
-        'password': '114xwxma',
-        'app_id': '/sc/892540/32_1008193986'
-    }
-    response = requests.post(API_BASE_URL + AUTH_ENDPOINT, headers=headers, data=data)
-    response_json = response.json()
-    return response_json['access_token']
+    response = requests.post(APP_AUTH_REFRESH_TOKEN_API_URL, headers=headers, data=request_payload)
 
-def list_root_folder(access_token):
-    # Make a GET request to list the contents of the root folder
+    # Check if the request was successful (status code 201)
+    if response.status_code == 201:
+        # Extract the refresh token from the "Location" response header
+        refresh_token = response.headers.get("Location")
+        return refresh_token
+    else:
+        # Handle unsuccessful response (e.g., log error, raise exception)
+        response.raise_for_status()
+
+# Usage example:
+username = config["SugarSync_Username"]
+password = config["SugarSync_Password"]
+application = config["SugarSync_AP_ID"]
+access_key = config["SugarSync_API_Key"]
+private_access_key = config["SugarSync_API_Secret"]
+
+def get_access_token(acc_key, priv_key, ref_token):
+    # Fill the XML request template
+    request_xml = f"""
+    <tokenAuthRequest>
+        <accessKeyId>{acc_key}</accessKeyId>
+        <privateAccessKey>{priv_key}</privateAccessKey>
+        <refreshToken>{ref_token}</refreshToken>
+    </tokenAuthRequest>
+    """
+
+    # Make a HTTP POST request to SugarSync authorization API
     headers = {
-        'Authorization': f'Bearer {access_token}'
+        'User-Agent': 'SugarSync API Sample/1.0',
+        'Content-Type': 'application/xml',
     }
-    response = requests.get(API_BASE_URL + FOLDER_ENDPOINT.format(folder_id='root'), headers=headers)
-    response_json = response.json()
-    return response_json
+    
+    response = requests.post('https://api.sugarsync.com/authorization', headers=headers, data=request_xml)
+    access_token = None
+    
+    # Check the response
+    if response.status_code == 201:
+        # Access token can be retrieved from the "Location" response header
+        access_token = response.headers['Location']
+        print("Access token:", access_token)
+    else:
+        print("Failed to obtain access token. HTTP Status Code:", response.status_code)
+        
+    return access_token
 
-def main():
-    # Get access token
-    access_token = get_access_token()
+def make_api_request(acc_token, endpoint, method='GET', data=None):
+    # Construct the request URL
+    url = f"https://api.sugarsync.com/{endpoint}"
+    
+    # Construct the request headers with the access token
+    headers = {
+        'Authorization': f'Bearer {acc_token}',
+        'Content-Type': 'application/json'
+    }
+    
+    # Make the API request
+    response = requests.request(method, url, headers=headers, json=data)
+    print("Response:", response)
+    
+    # Check the response status code
+    if response.status_code == 200:
+        # Check the content type
+        content_type = response.headers.get('Content-Type', '')
+        if 'application/json' in content_type:
+            return response.json()  # Return the JSON response data
+        else:
+            return response.text  # Return the response text as is
+    else:
+        # Handle error response (e.g., raise exception, log error)
+        response.raise_for_status()
+    
+# Gets our refresh token and access token using a user and password
+refresh_token = get_refresh_token(username, password, application, access_key, private_access_key)
+access_token = get_access_token(access_key, private_access_key, refresh_token)
+        
+def get_moonstones_folder_url() -> str:
+    root_url = config["SugarSync_Root_URL"]
+    
+    make_api_request(access_token, "user")
 
-    # List contents of root folder
-    root_folder_contents = list_root_folder(access_token)
-    print(root_folder_contents)
+get_moonstones_folder_url()
 
-if __name__ == '__main__':
-    main()

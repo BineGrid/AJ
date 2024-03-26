@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<receivedShares>
+    <receivedShare ref="https://api.sugarsync.com/receivedShare/892540/:sc:843427:1731477_11224">
+        <displayName>Moonstones SugarSync 2011</displayName>
+        <timeReceived>2011-01-31T20:02:03.000-08:00</timeReceived>
+        <sharedFolder>https://api.sugarsync.com/folder/:sc:843427:1731477_11224</sharedFolder>
+        <permissions>
+            <readAllowed enabled="true" />
+            <writeAllowed enabled="true" />
+        </permissions>
+        <owner>https://api.sugarsync.com/contact/892540/843427</owner>
+    </receivedShare>
+    <receivedShare ref="https://api.sugarsync.com/receivedShare/892540/:sc:843427:54012369_156176">
+        <displayName>Dave\'s Work</displayName>
+        <timeReceived>2019-01-31T10:10:34.000-08:00</timeReceived>
+        <sharedFolder>https://api.sugarsync.com/folder/:sc:843427:54012369_156176</sharedFolder>
+        <permissions>
+            <readAllowed enabled="true" />
+            <writeAllowed enabled="true" />
+        </permissions>
+        <owner>https://api.sugarsync.com/contact/892540/843427</owner>
+    </receivedShare>
+</receivedShares>'

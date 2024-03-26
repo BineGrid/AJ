@@ -4,6 +4,7 @@ from pathlib import Path
 import zipfile
 import DevLogger as DL
 import DevData as DD
+import openpyxl
 
 try:
     import pandas as pd
@@ -48,10 +49,12 @@ def __process_files_into_Ndf_arr(csv_path, sl_path):
             result_Ndf_arr.append(DD.NamedDataFrame(file_path, pd.read_csv(os.path.join(csv_path, filename))))
             files_found += 1
 
+    xl_workbook = openpyxl.load_workbook(sl_path)
     for sheet in ("S&L", "BoH Schedule", "FoH Schedule"):
         df = pd.read_excel(sl_path, sheet_name=sheet)
+        xl_sheet = xl_workbook[sheet]
         # Adds the content to the NDF_Arr
-        result_Ndf_arr.append(DD.NamedDataFrame(sl_path, df))
+        result_Ndf_arr.append(DD.NamedDataFrame(sl_path, df, xl_sheet, xl_workbook))
         files_found += 1 
 
     # + 3 for the 3 sheets in the excel S&L file

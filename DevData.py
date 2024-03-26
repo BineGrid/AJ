@@ -2,14 +2,18 @@ from math import nan
 import os
 import numpy as np
 from pandas import DataFrame as df
+from openpyxl import workbook
 
 class NamedDataFrame:
     '''
-        Added a name var to the pandas dataframe
+        Added a name var and a sheet_name to the pandas dataframe\n
+        Files with a xl_sheet are just excel files
     '''
-    def __init__(self, file_path: str, dataframe: df):
+    def __init__(self, file_path: str, dataframe: df, xl_sheet: workbook = None, xl_workbook: workbook = None):
         self.folder_path, self.file_name = os.path.split(file_path)
         self.dataframe = dataframe
+        self.xl_sheet = xl_sheet
+        self.xl_workbook = xl_workbook
 
 class DataCell:
     '''
@@ -33,6 +37,8 @@ class DataCell:
     def __init__(self, Ndf: NamedDataFrame, row_index: int, col_index: int):
         self.file_path = Ndf.folder_path
         self.df = Ndf.dataframe
+        self.xl_sheet = Ndf.xl_sheet
+        self.xl_workbook = Ndf.xl_workbook
         self.row_index = row_index
         self.col_index = col_index
         self.full_file_path = os.path.join(Ndf.folder_path, Ndf.file_name)
@@ -108,21 +114,18 @@ class DataCell:
     
     def write(self, value):
         '''
-            WARNING this does not work with excel files yet!
-            TODO make this work with excel 
-            
             This writes to a single DataCell and updates the actual file
         '''
-        self.df.iat[self.row_index, self.col_index] = value
         
         # Save the modified DataFrame back to the file
         if(self.file_ext == ".csv"):
+            self.df.iat[self.row_index, self.col_index] = value
             self.df.to_csv(self.full_file_path, index=False)
             
-        # Writitng to an excel file this way strips all its formatting 
-        # TODO use openpyxl to preserve the formating of excel file
-        #elif(self.file_ext == ".xlsx"):
-        #    self.df.to_excel(self.full_file_path, index=False)
+        elif(self.file_ext == ".xlsx"):
+            # +2 and +1 are for the proper shift between openpyxl between pandas df
+            self.xl_sheet.cell(self.row_index + 2, self.col_index + 1).value = value
+            self.xl_workbook.save(self.full_file_path)
         else:
             raise ValueError(f"Unsupported file type for DataCell.write(): {self.file_ext}")
     
@@ -148,13 +151,19 @@ class DCArray:
     def __init__(self, Ndfs_arr: list):
         self.DCArr = []
         self.Ndfs_arr = Ndfs_arr
-        
+        self.signature_dict = {}  # Dictionary to store lists of DataCells by signature
+
         for Ndf in self.Ndfs_arr:
             for i in range(len(Ndf.dataframe.index)):
                 for j in range(len(Ndf.dataframe.columns)):
-                    cellval = Ndf.dataframe.iat[i, j]
-                    if (cellval != 0) and (str(cellval) != "nan"):
-                        self.DCArr.append(DataCell(Ndf, i, j))
+                    data_cell = DataCell(Ndf, i, j)
+                    self.DCArr.append(data_cell)
+
+                    # Add the DataCell to the dictionary indexed by its signature
+                    if data_cell.signature not in self.signature_dict:
+                        self.signature_dict[data_cell.signature] = [data_cell]
+                    else:
+                        self.signature_dict[data_cell.signature].append(data_cell)
                         
     def size(self):
         return len(self.DCArr)
@@ -169,7 +178,7 @@ class DCArray:
         '''
             This returns an array of all the cells with the same signature
         '''
-        return [cell for cell in self.DCArr if cell.signature == sig]
+        return self.signature_dict.get(sig, [])
     
     def read_by_sign(self, sig: str):
         '''
@@ -181,14 +190,18 @@ class DCArray:
         
         numVals = len(values)
         
+        # If we dont find a value just return 0
         if numVals == 0: 
-            # This print seemed like a good idea, but it got old fast lol
-            #print(f"WARNING: No DC found for cell signature: [{sig}]")
             values = 0
+        # If its just a single value, remove the list property
         elif numVals == 1:
             values = values[0]
         
         return values
+    
+    def write_by_sign(self, sig: str, val):
+            for dc in self.get_dc_by_sign(sig):
+                dc.write(val)
     
     def read_by_sign_sum_results(self, sig: str):
         '''
