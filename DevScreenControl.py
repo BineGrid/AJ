@@ -31,7 +31,7 @@ class ShiftField:
 class ToastButton:
     CSV_Download = "DownloadCSVFiles.png"
 
-with open('config.json') as f:
+with open('/mnt/wslg/distro/home/dcann/mojo/AJ/config.json') as f:
   config = json.load(f)
   
 # Function to scroll down until a specific color is found
@@ -54,7 +54,7 @@ def find_image_move_until_color_found(image, color, x_move=0, y_move=0):
         x, y = pyautogui.locateCenterOnScreen(image_path, confidence=config["image_click_confidence"])
             
     except Exception as e:
-        DL.logger.error(f"Image: {image} with a confidene of {config["image_click_confidence"]}, was not found on the screen!")
+        DL.logger.error(f"Image: {image} with a confidene of {config['image_click_confidence']}, was not found on the screen!")
         DL.logger.exception(e)
         
     DL.logger.debug(f"Image: {image}, Found at ({int(x)},{int(y)})")
@@ -81,7 +81,7 @@ def click_image(image, x_offset=0, y_offset=0):
         # I inverted the y because I like negative numbers bringing us towards the bottom of the screen 
         pyautogui.click(x + x_offset, y - y_offset)
     except Exception as e:
-        DL.logger.error(f"Image: {image} with a confidene of {config["image_click_confidence"]}, was not found on the screen!")
+        DL.logger.error(f"Image: {image} with a confidene of {config['image_click_confidence']}, was not found on the screen!")
         DL.logger.exception(e)
     
 def enter_shiftnote_field(field: ShiftField, input: str):

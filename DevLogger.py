@@ -1,7 +1,7 @@
 import json
 import logging
 
-with open('config.json') as f:
+with open('/mnt/wslg/distro/home/dcann/mojo/AJ/config.json') as f:
   config = json.load(f)
   
 # Create a custom handler that updates the text element in the GUI window

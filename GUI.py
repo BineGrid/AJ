@@ -6,16 +6,22 @@ import Web
 import DevLogger as DL
 import DevReadWrite as DRW
 
+print("Finished imports")
+
 try:
+    print("Importing pysimplegui")
     import PySimpleGUI as sg
+    print("Successfully imported pysimplegui!")
 except ImportError as e:
     sg = None
     DL.logger.critical("PySimpleGUI doesn't seem to be installed. Please install it using 'pip install PySimpleGUI'.")
     DL.logger.critical("Exception: ", e)
 
-with open('config.json') as f:
+with open('/mnt/wslg/distro/home/dcann/mojo/AJ/config.json') as f:
   config = json.load(f)
        
+print("Imported Config!")
+
 # Define the input layout of the GUI
 input_layout = [
     [sg.Text("Select the CSV folder and Excel folder"), sg.Push(), sg.Button("Open Config")],
@@ -23,7 +29,7 @@ input_layout = [
     [sg.Button('Payroll Tool', key="-PAY-"),sg.Push(),sg.Checkbox("Save Reports", key='save')],
     [
         sg.FolderBrowse(button_text="Dwnld Folder", enable_events=True, size=(10, 2)),
-        sg.InputText(config["download_dir"], key="-DLFOLDER_TEXT-", size=(98, 1)),
+        sg.InputText(config["temp_dir"], key="-DLFOLDER_TEXT-", size=(98, 1)),
     ],
     [
         sg.FileBrowse(button_text="S&L File", enable_events=True, size=(10, 2)),
@@ -38,12 +44,14 @@ input_layout = [
 
 # Create the window
 window = sg.Window("AutoJustin V2", input_layout, finalize=True, icon='AJ.ico')
+
+print("Window Should be Created!")
 curr_shift = None
 csv_arr = []
 
 # Load in default checkbox value from config
 sales_labor_path = config["last_excel_path"]
-download_path = config["download_dir"]
+download_path = config["temp_dir"]
 
 # Update the gui elements with the old values from the config
 window["save"].update(config["save_reports"])
@@ -53,6 +61,7 @@ try:
 # Event loop
     while True:
         event, values = window.read()
+        print("LOOP!")
         
         if event == "-LOAD-":
             # Find the .shift file and load it in as a Shift class
@@ -74,7 +83,7 @@ try:
         if event == "Generate Report" and values["-DLFOLDER_TEXT-"] and values["-EXCELFOLDER_TEXT-"]:
             # Update all the settings and file paths from the gui elements to the config
             DL.logger.info("\n   - Generating Report -")
-            config["download_dir"] = download_dir = values["-DLFOLDER_TEXT-"]
+            config["temp_dir"] = download_dir = values["-DLFOLDER_TEXT-"]
             config["last_excel_path"] = sales_labor_path = values["-EXCELFOLDER_TEXT-"]
             config["save_reports"] = values["save"]
             config["delete_temp_files"] = values["delete"]
@@ -84,9 +93,9 @@ try:
             try:
                 Web.init_chrome()
                 Web.Toast.download_sales_summary()
-                DRW.unzip_sales_summary(config["download_dir"])
+                DRW.unzip_sales_summary(config["temp_dir"])
                 Web.Toast.download_payroll_export()
-                DRW.rellocate_payroll_csv(config["download_dir"])
+                DRW.rellocate_payroll_csv(config["temp_dir"])
             except Exception as e:
                 DL.logger.critical("ERROR: Failed to download the csv files from toast!")
                 DL.logger.exception(e)
@@ -105,7 +114,7 @@ try:
                 DL.logger.error("ERROR: Failed to read CSV files")
                 DL.logger.exception(e)
             
-            # Enter all the info into Shiftnote
+            # Enter all the info into Shiftnotepip in
             try:
                 Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
             except Exception as e:
@@ -133,7 +142,7 @@ try:
         # Update all the settings and file paths from the gui elements to the config
         # When the window closes
         if event == sg.WIN_CLOSED:
-            config["download_dir"] = download_path = values["-DLFOLDER_TEXT-"]
+            config["temp_dir"] = download_path = values["-DLFOLDER_TEXT-"]
             config["last_excel_path"] = sales_labor_path = values["-EXCELFOLDER_TEXT-"]
             config["save_reports"] = values["save"]
             config["delete_temp_files"] = values["delete"]

@@ -3,7 +3,7 @@ import json
 import pickle
 from DevData import *
 
-with open('config.json') as f:
+with open('/mnt/wslg/distro/home/dcann/mojo/AJ/config.json') as f:
   config = json.load(f)
 
 class Shift:

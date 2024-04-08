@@ -12,14 +12,14 @@ except ImportError as e:
     DL.logger.critical("Pandas doesn't seem to be installed. Please install it using 'pip install pandas'.")
     DL.logger.critical("Exception: ", e)
 
-with open('config.json') as f:
+with open('/mnt/wslg/distro/home/dcann/mojo/AJ/config.json') as f:
   config = json.load(f)
 
 def write_config(conf):
     '''
         This updates the config with its new values
     '''
-    with open('config.json', 'w') as f:
+    with open('/mnt/wslg/distro/home/dcann/mojo/AJ/config.json', 'w') as f:
         json.dump(conf, f, indent=4)
         
 def __process_files_into_Ndf_arr(csv_path, sl_path):
@@ -112,7 +112,7 @@ def unzip_sales_summary(dir: str, delete = config["delete_temp_files"]):
         
         # Delete download
         if delete:
-            os.remove(os.path.join(config["download_dir"], last_download))
+            os.remove(os.path.join(config["temp_dir"], last_download))
         else:    
             DL.logger.error(f"ERROR: No CSV files found in dir: {dir}")
         print("Last Download:", last_download)
@@ -125,8 +125,8 @@ def delete_everything_in_dir(dir: str):
     for file in os.listdir(dir):
         os.remove(os.path.join(dir, file))
     
-#unzip_sales_summary(config["download_dir"])
-#rellocate_payroll_csv(config["download_dir"])
+#unzip_sales_summary(config["temp_dir"])
+#rellocate_payroll_csv(config["temp_dir"])
 
                         
             

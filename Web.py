@@ -7,17 +7,23 @@
 """
 import json
 import time
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
-import DevScreenControl as DSC
-from DevScreenControl import ShiftField as SF, ToastButton
 from Shift import Shift
 
-with open('config.json') as f:
+if not (os.name == "posix"):
+    import DevScreenControl as DSC
+    from DevScreenControl import ShiftField as SF, ToastButton
+else:
+    import FakeScreenControl as DSC
+    from FakeScreenControl import ShiftField as SF, ToastButton
+
+with open('/mnt/wslg/distro/home/dcann/mojo/AJ/config.json') as f:
   config = json.load(f)
 
 class Tabs:
