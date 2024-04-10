@@ -39,9 +39,6 @@ class Shift:
         self.ProjFOHLabor = encapsulated_data.read_by_sign(f"S&L-Total Front Louse Cost-{self.currDay.upper()}")
         self.ProjBOHLaborPerc = round(encapsulated_data.read_by_sign(f"S&L-Total BOH Labor %-{self.currDay.upper()}"), 4)
         self.ProjFOHLaborPerc = round(encapsulated_data.read_by_sign(f"S&L-Total Front House %-{self.currDay.upper()}"), 4)
-        encapsulated_data.write_by_sign(f"S&L-SALES Bar/DR/Patio-Sunday", 420)
-        encapsulated_data.write_by_sign(f"S&L-SalesTakeout/Delivery-Sunday", 421)
-        encapsulated_data.write_by_sign(f"S&L-Total SP $-Sunday", 422)
         
         # Grabs the names of all the respective Job titles from the config
         self.__FOHJobTitles = config.get("foh_job_titles", [])

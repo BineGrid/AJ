@@ -1,23 +1,181 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<receivedShares>
-    <receivedShare ref="https://api.sugarsync.com/receivedShare/892540/:sc:843427:1731477_11224">
-        <displayName>Moonstones SugarSync 2011</displayName>
-        <timeReceived>2011-01-31T20:02:03.000-08:00</timeReceived>
-        <sharedFolder>https://api.sugarsync.com/folder/:sc:843427:1731477_11224</sharedFolder>
-        <permissions>
-            <readAllowed enabled="true" />
-            <writeAllowed enabled="true" />
-        </permissions>
-        <owner>https://api.sugarsync.com/contact/892540/843427</owner>
-    </receivedShare>
-    <receivedShare ref="https://api.sugarsync.com/receivedShare/892540/:sc:843427:54012369_156176">
-        <displayName>Dave\'s Work</displayName>
-        <timeReceived>2019-01-31T10:10:34.000-08:00</timeReceived>
-        <sharedFolder>https://api.sugarsync.com/folder/:sc:843427:54012369_156176</sharedFolder>
-        <permissions>
-            <readAllowed enabled="true" />
-            <writeAllowed enabled="true" />
-        </permissions>
-        <owner>https://api.sugarsync.com/contact/892540/843427</owner>
-    </receivedShare>
-</receivedShares>'
+<collectionContents end="33" hasMore="false" start="0">
+    <collection type="folder">
+        <displayName>Budget</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507023</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507023/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Correspondence</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507027</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507027/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Daily Journal</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507037</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507037/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Emergency Procedures</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507041</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507041/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Employee File</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507045</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507045/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Sadi's Files</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507047</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507047/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Forms</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507051</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507051/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>HOMEPAGE</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507053</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507053/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Liquor File</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507057</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507057/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Meeting Notes</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507067</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507067/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Memos</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507070</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507070/contents</contents>
+    </collection>
+    <file>
+        <displayName>Moonstones Exterior Sketch.jpg</displayName>
+        <ref>https://api.sugarsync.com/file/:sc:843427:3744006_507077</ref>
+        <size>2168068</size>
+        <lastModified>2010-05-11T09:09:00.000-07:00</lastModified>
+        <mediaType>image/jpeg</mediaType>
+        <presentOnServer>true</presentOnServer>
+        <fileData>https://api.sugarsync.com/file/:sc:843427:3744006_507077/data</fileData>
+    </file>
+    <collection type="folder">
+        <displayName>Order Guides</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507079</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507079/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Owner Moon</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507081</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507081/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Patio Documents</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507083</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507083/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Payroll Info</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507085</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507085/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Peggy's Work</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507087</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507087/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>PHONEBOOK</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507093</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507093/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>PowerPoint</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507098</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507098/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>PreMeal</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507100</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507100/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Schedules</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:3744006_507108</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:3744006_507108/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Sales and Labor</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:1819027_1482985</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:1819027_1482985/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Daily Reconciliation</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:22402428_115123</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:22402428_115123/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Account Files</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:22402428_969606</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:22402428_969606/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>P&amp;L</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:22402428_1906205</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:22402428_1906205/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Fooda</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:53242228_9220057</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:53242228_9220057/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>COSTS</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:53577594_21612450</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:53577594_21612450/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Credit Card Processing</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:53577594_34395144</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:53577594_34395144/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>MICROS</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:53577594_35013061</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:53577594_35013061/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Insurance</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:53577594_86268775</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:53577594_86268775/contents</contents>
+    </collection>
+    <file>
+        <displayName>Flood damage 2019 document.docx</displayName>
+        <ref>https://api.sugarsync.com/file/:sc:843427:53577594_103155521</ref>
+        <size>13014</size>
+        <lastModified>2019-04-05T14:56:02.000-07:00</lastModified>
+        <mediaType>application/octet-stream</mediaType>
+        <presentOnServer>true</presentOnServer>
+        <fileData>https://api.sugarsync.com/file/:sc:843427:53577594_103155521/data</fileData>
+    </file>
+    <collection type="folder">
+        <displayName>Delivery Services</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:53577594_104708532</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:53577594_104708532/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>TOAST</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:54077538_81858424</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:54077538_81858424/contents</contents>
+    </collection>
+    <collection type="folder">
+        <displayName>Justin's Files</displayName>
+        <ref>https://api.sugarsync.com/folder/:sc:843427:54461151_291990404</ref>
+        <contents>https://api.sugarsync.com/folder/:sc:843427:54461151_291990404/contents</contents>
+    </collection>
+</collectionContents>

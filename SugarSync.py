@@ -2,7 +2,9 @@ import json
 from xml.dom.minidom import Element
 import requests
 import xml.etree.ElementTree as ET
-
+import os
+import re
+from datetime import datetime, timedelta
 
 # Load configuration from JSON file
 with open('config.json') as f:
@@ -74,10 +76,7 @@ def get_access_token(acc_key, priv_key, ref_token):
         
     return access_token
 
-def make_api_request(acc_token, endpoint, method='GET', data=None):
-    # Construct the request URL
-    url = f"https://api.sugarsync.com/{endpoint}"
-    
+def make_api_request(acc_token, url, method='GET', data=None):
     # Construct the request headers with the access token
     headers = {
         'Authorization': f'Bearer {acc_token}',
@@ -103,11 +102,68 @@ def make_api_request(acc_token, endpoint, method='GET', data=None):
 # Gets our refresh token and access token using a user and password
 refresh_token = get_refresh_token(username, password, application, access_key, private_access_key)
 access_token = get_access_token(access_key, private_access_key, refresh_token)
+
+def __get_element_name(element: Element) -> str:
+    return element.find('displayName').text
+
+def __list_all_folder_elements(folder_url: str) -> list[Element]:
+    folder_xml_tree = ET.fromstring(make_api_request(access_token, folder_url))
+    return [folder for folder in folder_xml_tree.findall(".//collection[@type='folder']")]
+
+def __find_element_by_subelement_value(folder_url: str, find_input: str, sub_val: str):
+    element_list = __list_all_folder_elements(folder_url)
+    
+    for element in element_list:
+        if element.find(find_input).text == sub_val:
+            return element
+
+def __find_folder_in_url(folder_url: str, folder_display_name: str) -> Element:
+    '''
+        This functions finds all the collection elements with the 'type=folder' tag
+        
+        You must pass in a folders contents url and it cant be the user folder or the shared folder
+        it must be within the dir
+    '''
+    contents_folder = ET.fromstring(make_api_request(access_token, folder_url))
+    
+    for collection in contents_folder.findall(".//collection[@type='folder']"):
+        if __get_element_name(collection) == folder_display_name:
+            return collection
+        
+def __find_dated_folder_element(today: datetime, folder_url: str) -> Element:
+    element_list = __list_all_folder_elements(folder_url)
+    
+    for element in element_list
+    
+def
+    
         
 def get_moonstones_folder_url() -> str:
-    root_url = config["SugarSync_Root_URL"]
-    
-    make_api_request(access_token, "user")
 
-get_moonstones_folder_url()
+    # Grabs the root user xml tree
+    root = ET.fromstring(make_api_request(access_token, config["SugarSync_Root_URL"]))
+    shared_folders_url = root.find('receivedShares').text
+    
+    shared_root = ET.fromstring(make_api_request(access_token, shared_folders_url))
+    
+    for received_share in shared_root.findall('receivedShare'):
+        display_name = received_share.find('displayName').text
+        if display_name == "Moonstones SugarSync 2011":
+            return received_share.find('sharedFolder').text 
+        
+def get_sales_and_labor_url() -> str:
+    moonstones_folder = ET.fromstring(make_api_request(access_token, get_moonstones_folder_url()))
+    
+    contents_url = moonstones_folder.find('contents').text
+    
+    admin_folder_url = __find_folder_in_url(contents_url, "ADMIN").find('contents').text
+    
+    print("Admin Folder URL:", admin_folder_url)
+            
+    return __find_folder_in_url(admin_folder_url, "Sales and Labor").find('contents').text
+    
+            
+print(__list_all_folder_elements("https://api.sugarsync.com/folder/:sc:843427:1819027_1482985/contents"))   
+#print(get_sales_and_labor_url())
+#print(make_api_request(access_token, "https://api.sugarsync.com/folder/:sc:843427:1731477_11224/contents"))
 

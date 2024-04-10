@@ -5,6 +5,7 @@ import os
 import Web
 import DevLogger as DL
 import DevReadWrite as DRW
+from timeit import default_timer as timer
 
 try:
     import PySimpleGUI as sg
@@ -55,6 +56,8 @@ try:
         event, values = window.read()
         
         if event == "-LOAD-":
+            start_time = timer()
+
             # Find the .shift file and load it in as a Shift class
             load_path = sg.popup_get_file('Pick a saved shift to load', initial_folder=config["saved_reports_dir"], file_types=[("Shift Files","*.shift")])
             loaded_shift = load_shift_file(load_path)
@@ -66,6 +69,9 @@ try:
             print(loaded_shift.get_sales_proj_vs_act_perc())
             print(loaded_shift.get_sales_proj_vs_act_labor())
             print(loaded_shift.get_present_job_title_count())
+            
+            end_time = timer()
+            DL.logger.debug(f"[Total Load Time]: {end_time - start_time}")
         
         # Literally opens the config.json lol
         if event == "Open Config":
@@ -142,8 +148,8 @@ try:
 # Just catch any possible exception that way the gui doesn't just suddenly close
 except Exception as e:
     DL.logger.exception(e)
-    DL.logger.critical("-= Closing window in 10 seconds! =-")
-    time.sleep(10)
+    DL.logger.critical("-= Closing window in 20 seconds! =-")
+    time.sleep(20)
 
 # Close the window just in case it gets stuck somehow
 window.close()
