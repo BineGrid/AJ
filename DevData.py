@@ -2,6 +2,8 @@ from math import nan
 import os
 import numpy as np
 from pandas import DataFrame as df
+import time
+import DevLogger as DL
 
 class NamedDataFrame:
     '''
@@ -148,13 +150,28 @@ class DCArray:
     def __init__(self, Ndfs_arr: list):
         self.DCArr = []
         self.Ndfs_arr = Ndfs_arr
-        
+        self.signature_dict = {}  # Dictionary to store lists of DataCells by signature
+
+        cum_dc_time = 0
+        start_time = time.process_time()
         for Ndf in self.Ndfs_arr:
             for i in range(len(Ndf.dataframe.index)):
                 for j in range(len(Ndf.dataframe.columns)):
-                    cellval = Ndf.dataframe.iat[i, j]
-                    if (cellval != 0) and (str(cellval) != "nan"):
-                        self.DCArr.append(DataCell(Ndf, i, j))
+                    dc_start_time = time.process_time_ns()
+                    data_cell = DataCell(Ndf, i, j)
+                    dc_end_time = time.process_time_ns()
+                    cum_dc_time += (dc_end_time - dc_start_time)
+                    self.DCArr.append(data_cell)
+
+                    # Add the DataCell to the dictionary indexed by its signature
+                    if data_cell.signature not in self.signature_dict:
+                        self.signature_dict[data_cell.signature] = [data_cell]
+                    else:
+                        self.signature_dict[data_cell.signature].append(data_cell)
+        
+        end_time = time.process_time()
+        DL.logger.debug(f"[DC Dictionary Creation Time]: {(end_time - start_time):0.4f}s")
+        DL.logger.debug(f"[Avg Individual DC]: {((cum_dc_time / 100) / len(self.signature_dict)):0.4f}ms")
                         
     def size(self):
         return len(self.DCArr)
@@ -169,7 +186,7 @@ class DCArray:
         '''
             This returns an array of all the cells with the same signature
         '''
-        return [cell for cell in self.DCArr if cell.signature == sig]
+        return self.signature_dict.get(sig, [])
     
     def read_by_sign(self, sig: str):
         '''

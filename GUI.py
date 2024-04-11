@@ -1,3 +1,6 @@
+from tracemalloc import start
+from turtle import st
+from DevData import DCArray
 from Shift import Shift, load_shift_file, save_shift_file
 import time
 import json
@@ -5,6 +8,7 @@ import os
 import Web
 import DevLogger as DL
 import DevReadWrite as DRW
+import time
 
 try:
     import PySimpleGUI as sg
@@ -55,23 +59,30 @@ try:
         event, values = window.read()
         
         if event == "-LOAD-":
+            start_timer = time.process_time()
+            DL.logger.info("\n\n   - Loading Report -")
             # Find the .shift file and load it in as a Shift class
             load_path = sg.popup_get_file('Pick a saved shift to load', initial_folder=config["saved_reports_dir"], file_types=[("Shift Files","*.shift")])
             loaded_shift = load_shift_file(load_path)
-            DL.logger.info("\n\n   - Loading Report -")
             
             # print loaded shift
-            loaded_shift.print_member_variables()
-            print(loaded_shift.get_hourly_report_str())
-            print(loaded_shift.get_sales_proj_vs_act_perc())
-            print(loaded_shift.get_sales_proj_vs_act_labor())
-            print(loaded_shift.get_present_job_title_count())
+            # This allows for older shift files to still be backwards compatible
+            updated_shift = Shift(DCArray(loaded_shift.encaped_data.Ndfs_arr))
+            print(updated_shift.get_hourly_report_str())
+            print(updated_shift.get_sales_proj_vs_act_perc())
+            print(updated_shift.get_sales_proj_vs_act_labor())
+            print(updated_shift.get_present_job_title_count())
+            
+            end_timer = time.process_time()
+            DL.logger.debug(f"[LOAD Time]: {(end_timer - start_timer):0.4f}s")
         
         # Literally opens the config.json lol
         if event == "Open Config":
             os.startfile("config.json")
             
         if event == "Generate Report" and values["-DLFOLDER_TEXT-"] and values["-EXCELFOLDER_TEXT-"]:
+            start_time = time.process_time()
+            
             # Update all the settings and file paths from the gui elements to the config
             DL.logger.info("\n   - Generating Report -")
             config["download_dir"] = download_dir = values["-DLFOLDER_TEXT-"]
@@ -79,9 +90,13 @@ try:
             config["save_reports"] = values["save"]
             config["delete_temp_files"] = values["delete"]
             DRW.write_config(config)
+            
+            # Log Config Read Write Time
+            config_time = time.process_time()
+            DL.logger.debug(f"[Config RW Time]: {(config_time - start_time):0.4f}s")
 
             # Download all the files from the web then move it to /temp
-            try:
+            try: 
                 Web.init_chrome()
                 Web.Toast.download_sales_summary()
                 DRW.unzip_sales_summary(config["download_dir"])
@@ -90,12 +105,22 @@ try:
             except Exception as e:
                 DL.logger.critical("ERROR: Failed to download the csv files from toast!")
                 DL.logger.exception(e)
+            
+            download_csv_time = time.process_time()
+            DL.logger.debug(f"[Download CSV Time]: {(download_csv_time - config_time):0.4f}s")
         
             # Convert all the needed csv files in temp to a DCArray
             # Then create a Shift object with it
             try:
                 encapsulated_data = DRW.create_ecapsulated_data(config["temp_dir"], sales_labor_path)
+                
+                encapsulated_time = time.process_time()
+                DL.logger.debug(f"[Data Encapsulation Time]: {(encapsulated_time - download_csv_time):0.4f}s")
+                
                 curr_shift = Shift(encapsulated_data)
+                
+                encapsulated_read_time = time.process_time()
+                DL.logger.debug(f"[Encaped Data Read Time]: {(encapsulated_read_time - encapsulated_time):0.4f}s")
                 
                 # Delete all files in temp if config says so
                 if config["delete_temp_files"]:
@@ -104,13 +129,17 @@ try:
             except Exception as e:
                 DL.logger.error("ERROR: Failed to read CSV files")
                 DL.logger.exception(e)
-            
+
             # Enter all the info into Shiftnote
             try:
                 Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
             except Exception as e:
                 DL.logger.error("ERROR: Failed to input shift into ShiftNote")
                 DL.logger.exception(e)
+                
+            shiftnote_time = time.process_time()
+            DL.logger.debug(f"[Enter ShiftNote Time]: {(shiftnote_time - encapsulated_read_time):0.4f}s")
+                
             
             # Print all the data because its cool
             try:
@@ -126,6 +155,9 @@ try:
             except Exception as e:
                 DL.logger.error("ERROR: Failed to print shift details! Exception:")
                 DL.logger.exception(e)
+                
+            data_out_time = time.process_time()
+            DL.logger.debug(f"[Print and Save Time]: {(data_out_time - shiftnote_time):0.4f}s")
                 
         elif event == "Generate Report":
             DL.logger.error("ERROR: Missing required file path(s)!")
