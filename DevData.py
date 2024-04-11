@@ -3,6 +3,8 @@ import os
 import numpy as np
 from pandas import DataFrame as df
 from openpyxl import workbook
+import time
+import DevLogger as DL
 
 class NamedDataFrame:
     '''
@@ -153,10 +155,15 @@ class DCArray:
         self.Ndfs_arr = Ndfs_arr
         self.signature_dict = {}  # Dictionary to store lists of DataCells by signature
 
+        cum_dc_time = 0
+        start_time = time.process_time()
         for Ndf in self.Ndfs_arr:
             for i in range(len(Ndf.dataframe.index)):
                 for j in range(len(Ndf.dataframe.columns)):
+                    dc_start_time = time.process_time_ns()
                     data_cell = DataCell(Ndf, i, j)
+                    dc_end_time = time.process_time_ns()
+                    cum_dc_time += (dc_end_time - dc_start_time)
                     self.DCArr.append(data_cell)
 
                     # Add the DataCell to the dictionary indexed by its signature
@@ -164,6 +171,10 @@ class DCArray:
                         self.signature_dict[data_cell.signature] = [data_cell]
                     else:
                         self.signature_dict[data_cell.signature].append(data_cell)
+        
+        end_time = time.process_time()
+        DL.logger.debug(f"[DC Dictionary Creation Time]: {(end_time - start_time):0.4f}s")
+        DL.logger.debug(f"[Avg Individual DC]: {((cum_dc_time / 100) / len(self.signature_dict)):0.4f}ms")
                         
     def size(self):
         return len(self.DCArr)
