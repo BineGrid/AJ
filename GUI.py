@@ -1,5 +1,3 @@
-from tracemalloc import start
-from turtle import st
 from DevData import DCArray
 from Shift import Shift, load_shift_file, save_shift_file
 import time
@@ -22,8 +20,8 @@ with open('config.json') as f:
        
 # Define the input layout of the GUI
 input_layout = [
-    [sg.Text("Select the CSV folder and Excel folder"), sg.Push(), sg.Button("Open Config")],
-    [sg.Text("Please be sure to unzip the files!"), sg.Push(), sg.Checkbox("Delete Temp Files", key='delete')],
+    [sg.Text("Select the Dowloads folder and Excel folder"), sg.Push(), sg.Button("Open Config")],
+    [sg.Push(), sg.Checkbox("Delete Temp Files", key='delete')],
     [sg.Button('Payroll Tool', key="-PAY-"),sg.Push(),sg.Checkbox("Save Reports", key='save')],
     [
         sg.FolderBrowse(button_text="Dwnld Folder", enable_events=True, size=(10, 2)),
