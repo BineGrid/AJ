@@ -67,10 +67,10 @@ def __process_files_into_Ndf_arr(csv_path, sl_path):
 
     return result_Ndf_arr
 
-def create_ecapsulated_data(csv_folder_path, excel_folder_path) -> DD.DCArray:
+def create_ecapsulated_data(csv_folder_path, excel_folder_path) -> DD.DCDictionary:
     try:
         DL.logger.debug("Starting Data Encapsulation")
-        encapsulated_data = DD.DCArray(__process_files_into_Ndf_arr(csv_folder_path, excel_folder_path))
+        encapsulated_data = DD.DCDictionary(__process_files_into_Ndf_arr(csv_folder_path, excel_folder_path))
         DL.logger.debug(f"Encapsulated Data: {encapsulated_data.size()}")
     except Exception as e:
         DL.logger.error("ERROR: Failed to process CSV files. Exception:")

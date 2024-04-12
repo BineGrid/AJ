@@ -11,7 +11,7 @@ class Shift:
         This class is all the data for a single shift
     '''
     
-    def __init__(self, encapsulated_data: DCArray):
+    def __init__(self, encapsulated_data: DCDictionary):
         
         self.encaped_data = encapsulated_data
         

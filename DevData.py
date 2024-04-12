@@ -6,6 +6,13 @@ from openpyxl import workbook
 import time
 import DevLogger as DL
 
+#███╗   ██╗██████╗ ███████╗
+#████╗  ██║██╔══██╗██╔════╝
+#██╔██╗ ██║██║  ██║█████╗  
+#██║╚██╗██║██║  ██║██╔══╝  
+#██║ ╚████║██████╔╝██║     
+#╚═╝  ╚═══╝╚═════╝ ╚═╝     
+
 class NamedDataFrame:
     '''
         Added a name var and a sheet_name to the pandas dataframe\n
@@ -17,6 +24,12 @@ class NamedDataFrame:
         self.xl_sheet = xl_sheet
         self.xl_workbook = xl_workbook
 
+#██████╗  █████╗ ████████╗ █████╗  ██████╗███████╗██╗     ██╗     
+#██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔════╝██╔════╝██║     ██║     
+#██║  ██║███████║   ██║   ███████║██║     █████╗  ██║     ██║     
+#██║  ██║██╔══██║   ██║   ██╔══██║██║     ██╔══╝  ██║     ██║     
+#██████╔╝██║  ██║   ██║   ██║  ██║╚██████╗███████╗███████╗███████╗
+#╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚══════╝╚══════╝╚══════╝
 class DataCell:
     '''
         - This class is essentially just a single cell within a df
@@ -139,15 +152,21 @@ class DataCell:
         print(f"signature: {self.signature}")
         print(f"val: {self.read()}")
             
-
+            
+#██████╗  ██████╗    ██████╗ ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗ █████╗ ██████╗ ██╗   ██╗
+#██╔══██╗██╔════╝    ██╔══██╗██║██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔══██╗██╔══██╗╚██╗ ██╔╝
+#██║  ██║██║         ██║  ██║██║██║        ██║   ██║██║   ██║██╔██╗ ██║███████║██████╔╝ ╚████╔╝ 
+#██║  ██║██║         ██║  ██║██║██║        ██║   ██║██║   ██║██║╚██╗██║██╔══██║██╔══██╗  ╚██╔╝  
+#██████╔╝╚██████╗    ██████╔╝██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║██║  ██║██║  ██║   ██║   
+#╚═════╝  ╚═════╝    ╚═════╝ ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
         
-class DCArray:
+class DCDictionary:
     '''
-        This stands for DataCellArray
+        This stands for DataCellDictionary
         
-        This takes in a df array and creates DataCell array 
-        and then offers helpful functions to make using a 
-        DataCell array easier and more friendly :)
+        This takes in a df array and creates DataCell dictionary 
+        and then offers helpful functions to read and write to any
+        DataCell in the dictionary
     '''
         
     def __init__(self, Ndfs_arr: list):

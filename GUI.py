@@ -1,4 +1,4 @@
-from DevData import DCArray
+from DevData import DCDictionary
 from Shift import Shift, load_shift_file, save_shift_file
 import time
 import json
@@ -105,7 +105,7 @@ try:
             
             # print loaded shift
             # This allows for older shift files to still be backwards compatible
-            updated_shift = Shift(DCArray(loaded_shift.encaped_data.Ndfs_arr))
+            updated_shift = Shift(DCDictionary(loaded_shift.encaped_data.Ndfs_arr))
             print(updated_shift.get_hourly_report_str())
             print(updated_shift.get_sales_proj_vs_act_perc())
             print(updated_shift.get_sales_proj_vs_act_labor())
