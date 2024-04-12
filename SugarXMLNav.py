@@ -9,17 +9,17 @@ from datetime import date
 with open('config.json') as f:
     config = json.load(f)
     
-#  █████╗ ██╗   ██╗████████╗██╗  ██╗███████╗███╗   ██╗████████╗██╗ ██████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+    
+#   █████╗ ██╗   ██╗████████╗██╗  ██╗███████╗███╗   ██╗████████╗██╗ ██████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
 #  ██╔══██╗██║   ██║╚══██╔══╝██║  ██║██╔════╝████╗  ██║╚══██╔══╝██║██╔════╝██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
 #  ███████║██║   ██║   ██║   ███████║█████╗  ██╔██╗ ██║   ██║   ██║██║     ███████║   ██║   ██║██║   ██║██╔██╗ ██║
 #  ██╔══██║██║   ██║   ██║   ██╔══██║██╔══╝  ██║╚██╗██║   ██║   ██║██║     ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
 #  ██║  ██║╚██████╔╝   ██║   ██║  ██║███████╗██║ ╚████║   ██║   ██║╚██████╗██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
                                                      
-
 API_SAMPLE_USER_AGENT = "/Folders"
 APP_AUTH_REFRESH_TOKEN_API_URL = "https://api.sugarsync.com/app-authorization"
 
-def get_refresh_token(username, password, application, access_key, private_access_key):
+def __get_refresh_token(username, password, application, access_key, private_access_key):
     # Construct the XML request payload
     request_payload = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <appAuthorization>
@@ -53,7 +53,7 @@ application = config["SugarSync_AP_ID"]
 access_key = config["SugarSync_API_Key"]
 private_access_key = config["SugarSync_API_Secret"]
 
-def get_access_token(acc_key, priv_key, ref_token):
+def __get_access_token(acc_key, priv_key, ref_token):
     # Fill the XML request template
     request_xml = f"""
     <tokenAuthRequest>
@@ -83,8 +83,8 @@ def get_access_token(acc_key, priv_key, ref_token):
     return access_token
 
 # --=== These are the authentication tokens ===--
-refresh_token = get_refresh_token(username, password, application, access_key, private_access_key)
-access_token = get_access_token(access_key, private_access_key, refresh_token)
+__refresh_token = __get_refresh_token(username, password, application, access_key, private_access_key)
+__access_token = __get_access_token(access_key, private_access_key, __refresh_token)
 # These are really important ^^^
 
 
@@ -139,7 +139,7 @@ def list_all_folder_elements(folder_url: str) -> list[Element]:
     '''
         Returns a list of all the elements within a folders contents url
     '''
-    folder_xml_tree = ET.fromstring(make_api_request(access_token, folder_url))
+    folder_xml_tree = ET.fromstring(make_api_request(__access_token, folder_url))
     return [folder for folder in folder_xml_tree.findall(".//collection[@type='folder']")]
 
 def find_folder_in_url(folder_url: str, folder_display_name: str) -> Element:
@@ -149,7 +149,7 @@ def find_folder_in_url(folder_url: str, folder_display_name: str) -> Element:
         You must pass in a folders contents url and it cant be the user folder or the shared folder
         it must be within the dir
     '''
-    contents_folder = ET.fromstring(make_api_request(access_token, folder_url))
+    contents_folder = ET.fromstring(make_api_request(__access_token, folder_url))
     
     for collection in contents_folder.findall(".//collection[@type='folder']"):
         if get_element_name(collection) == folder_display_name:
@@ -163,10 +163,10 @@ def get_moonstones_folder_url() -> str:
     '''
 
     # Grabs the root user xml tree
-    root = ET.fromstring(make_api_request(access_token, config["SugarSync_Root_URL"]))
+    root = ET.fromstring(make_api_request(__access_token, config["SugarSync_Root_URL"]))
     shared_folders_url = root.find('receivedShares').text
     
-    shared_root = ET.fromstring(make_api_request(access_token, shared_folders_url))
+    shared_root = ET.fromstring(make_api_request(__access_token, shared_folders_url))
     
     for received_share in shared_root.findall('receivedShare'):
         display_name = received_share.find('displayName').text
@@ -181,7 +181,7 @@ def find_folder_url_xpath(x_path: str) -> str:
     '''
     ordered_folder_list = x_path.split("/")
     
-    moonstones_folder = ET.fromstring(make_api_request(access_token, get_moonstones_folder_url()))
+    moonstones_folder = ET.fromstring(make_api_request(__access_token, get_moonstones_folder_url()))
     curr_folder_url = moonstones_folder.find('contents').text
     
     for next_folder in ordered_folder_list:
@@ -216,7 +216,6 @@ def extract_folder_date(string: str):
     
     # If neither month and year nor year pattern found, return None
     return None
-    
            
 def find_dated_folder_element(date: date, folder_url: str) -> Element:
     '''
@@ -236,6 +235,15 @@ def find_dated_folder_element(date: date, folder_url: str) -> Element:
                 return element
         elif extract_date[1] == date.year:
             return element
+        
+        
+#  ██████╗  ██████╗ ██╗    ██╗███╗   ██╗██╗      ██████╗  █████╗ ██████╗ 
+#  ██╔══██╗██╔═══██╗██║    ██║████╗  ██║██║     ██╔═══██╗██╔══██╗██╔══██╗
+#  ██║  ██║██║   ██║██║ █╗ ██║██╔██╗ ██║██║     ██║   ██║███████║██║  ██║
+#  ██║  ██║██║   ██║██║███╗██║██║╚██╗██║██║     ██║   ██║██╔══██║██║  ██║
+#  ██████╔╝╚██████╔╝╚███╔███╔╝██║ ╚████║███████╗╚██████╔╝██║  ██║██████╔╝
+
+
         
 def download_latest_SL():
     sl_year_folder_url = find_dated_folder_element(date.today(), find_folder_url_xpath("ADMIN/Sales and Labor")).find("contents").text

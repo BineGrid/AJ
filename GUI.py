@@ -17,12 +17,20 @@ except ImportError as e:
 
 with open('config.json') as f:
   config = json.load(f)
-       
+  
+  
+#██╗      █████╗ ██╗   ██╗ ██████╗ ██╗   ██╗████████╗███████╗
+#██║     ██╔══██╗╚██╗ ██╔╝██╔═══██╗██║   ██║╚══██╔══╝██╔════╝
+#██║     ███████║ ╚████╔╝ ██║   ██║██║   ██║   ██║   ███████╗
+#██║     ██╔══██║  ╚██╔╝  ██║   ██║██║   ██║   ██║   ╚════██║
+#███████╗██║  ██║   ██║   ╚██████╔╝╚██████╔╝   ██║   ███████║
+#╚══════╝╚═╝  ╚═╝   ╚═╝    ╚═════╝  ╚═════╝    ╚═╝   ╚══════╝
+
 # Define the input layout of the GUI
 input_layout = [
-    [sg.Text("Select the Dowloads folder and Excel folder"), sg.Push(), sg.Button("Open Config")],
-    [sg.Push(), sg.Checkbox("Delete Temp Files", key='delete')],
-    [sg.Button('Payroll Tool', key="-PAY-"),sg.Push(),sg.Checkbox("Save Reports", key='save')],
+    [sg.Text("Select the Dowloads folder and Excel folder"), sg.Push(), sg.Button('⚙ Settings', size=(10, 1),  enable_events=True, font=('Arial', 12))],
+    [sg.Checkbox("Delete Temp Files", key='delete'), sg.Push()],
+    [sg.Checkbox("Save Reports", key='save'),sg.Push(),sg.Button('Payroll Tool', key="-PAY-")],
     [
         sg.FolderBrowse(button_text="Dwnld Folder", enable_events=True, size=(10, 2)),
         sg.InputText(config["download_dir"], key="-DLFOLDER_TEXT-", size=(98, 1)),
@@ -38,6 +46,13 @@ input_layout = [
     [sg.Output(size=(110, 25), key="-OUTPUT-")]
 ]
 
+# ██████╗ ██╗   ██╗██╗    ██╗    ██╗██╗███╗   ██╗██████╗  ██████╗ ██╗    ██╗███████╗
+#██╔════╝ ██║   ██║██║    ██║    ██║██║████╗  ██║██╔══██╗██╔═══██╗██║    ██║██╔════╝
+#██║  ███╗██║   ██║██║    ██║ █╗ ██║██║██╔██╗ ██║██║  ██║██║   ██║██║ █╗ ██║███████╗
+#██║   ██║██║   ██║██║    ██║███╗██║██║██║╚██╗██║██║  ██║██║   ██║██║███╗██║╚════██║
+#╚██████╔╝╚██████╔╝██║    ╚███╔███╔╝██║██║ ╚████║██████╔╝╚██████╔╝╚███╔███╔╝███████║
+# ╚═════╝  ╚═════╝ ╚═╝     ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═════╝  ╚══╝╚══╝ ╚══════╝
+
 # Create the window
 window = sg.Window("AutoJustin V2", input_layout, finalize=True, icon='AJ.ico')
 curr_shift = None
@@ -51,13 +66,38 @@ download_path = config["download_dir"]
 window["save"].update(config["save_reports"])
 window["delete"].update(config["delete_temp_files"])
 
+def openSettings():
+    layout = [
+        [sg.Text('Color Scheme:')],
+        [sg.Listbox(sg.theme_list(), default_values=[sg.user_settings_get_entry('theme')], size=(15, 8), k='ThemeListBox')],
+        [sg.VPush()],
+        [sg.Button('Cancel'), sg.Button('Save'), sg.Push()]]
+    
+    # Create the Window
+    window = sg.Window('Settings', layout,
+                        size=(500, 500), icon='AJ.ico')
+
+
+# ██████╗ ██████╗ ███╗   ██╗████████╗██████╗  ██████╗ ██╗     
+#██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██╔═══██╗██║     
+#██║     ██║   ██║██╔██╗ ██║   ██║   ██████╔╝██║   ██║██║     
+#██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██╗██║   ██║██║     
+#╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║╚██████╔╝███████╗
+# ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+#          ██╗      ██████╗  ██████╗ ██████╗                  
+#          ██║     ██╔═══██╗██╔═══██╗██╔══██╗                 
+#          ██║     ██║   ██║██║   ██║██████╔╝                 
+#          ██║     ██║   ██║██║   ██║██╔═══╝                  
+#          ███████╗╚██████╔╝╚██████╔╝██║                      
+#          ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝                      
+
 try:
 # Event loop
     while True:
         event, values = window.read()
         
         if event == "-LOAD-":
-            start_timer = time.process_time()
+            start_time = time.process_time()
             DL.logger.info("\n\n   - Loading Report -")
             # Find the .shift file and load it in as a Shift class
             load_path = sg.popup_get_file('Pick a saved shift to load', initial_folder=config["saved_reports_dir"], file_types=[("Shift Files","*.shift")])
@@ -71,11 +111,8 @@ try:
             print(updated_shift.get_sales_proj_vs_act_labor())
             print(updated_shift.get_present_job_title_count())
             
-            end_timer = time.process_time()
-            DL.logger.debug(f"[LOAD Time]: {(end_timer - start_timer):0.4f}s")
-            
-            end_time = timer()
-            DL.logger.debug(f"[Total Load Time]: {end_time - start_time}")
+            load_time = time.process_time()
+            DL.logger.debug(f"[LOAD Time]: {(load_time - start_time):0.4f}s")
         
         # Literally opens the config.json lol
         if event == "Open Config":
@@ -166,17 +203,18 @@ try:
         # Update all the settings and file paths from the gui elements to the config
         # When the window closes
         if event == sg.WIN_CLOSED:
-            config["download_dir"] = download_path = values["-DLFOLDER_TEXT-"]
-            config["last_excel_path"] = sales_labor_path = values["-EXCELFOLDER_TEXT-"]
+            config["download_dir"] = values["-DLFOLDER_TEXT-"]
+            config["last_excel_path"] = values["-EXCELFOLDER_TEXT-"]
             config["save_reports"] = values["save"]
             config["delete_temp_files"] = values["delete"]
             DRW.write_config(config)
+            break
             
 # Just catch any possible exception that way the gui doesn't just suddenly close
 except Exception as e:
     DL.logger.exception(e)
     DL.logger.critical("-= Closing window in 20 seconds! =-")
-    time.sleep(20)
+    time.sleep(2)
 
 # Close the window just in case it gets stuck somehow
 window.close()
