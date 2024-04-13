@@ -239,14 +239,12 @@ def extract_file_date_range(string: str) -> tuple[date, date]:
     # Define regular expression patterns for matching month and year
     date_pattern = r'(\d{2}\.\d{2}\.\d{4})\-(\d{2}\.\d{2}\.\d{4})'  # Matches month and year in format MM.DD.YYYY
 
-    print(f"Input String: {string}")
     match = re.search(date_pattern, string)
     
     if match:
         # Extract and parse the two dates
         date1 = datetime.strptime(match.group(1), '%m.%d.%Y').date()
         date2 = datetime.strptime(match.group(2), '%m.%d.%Y').date()
-        print(f"Date1: {date1}    Date2: {date2}")
         return (date1, date2)
     
     # If no date range found return none
@@ -254,8 +252,8 @@ def extract_file_date_range(string: str) -> tuple[date, date]:
            
 def find_dated_folder_element(date: date, folder_url: str) -> Element:
     '''
-        Takes in a date_time and then finds the folder within the folder_url 
-        whos name best matches that date_time
+        Takes in a date and then finds the folder within the folder_url 
+        whos name best matches that date
         
         Folders in our sugarsync follow the dating conevtion of either just being dated
         as a single year or being dated as a single month within a specific year
@@ -319,9 +317,11 @@ def download_file(url: str, dir: str, filename: str):
         DL.logger.error(f"Failed to download file from {url}. HTTP Status Code: {response.status_code}")
 
 
-def download_dated_SL_file(date: date, dir: str):
+def download_dated_SL_file(date: date, dir: str) -> str:
     '''
         Locates the proper S&L folder depending on the date inputed
+        
+        Returns the downloaded filename 
     '''
     # Open the first dated folder
     sl_folder_contents = find_dated_folder_element(date, find_folder_url_xpath("ADMIN/Sales and Labor")).find('contents').text
@@ -336,5 +336,4 @@ def download_dated_SL_file(date: date, dir: str):
     filedata_url = sl_element.find("fileData").text
     
     download_file(filedata_url, dir, file_name)
-    
-download_dated_SL_file(date.today(), config["temp_dir"])
+    return file_name

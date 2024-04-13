@@ -1,4 +1,6 @@
 from DevData import DCDictionary
+import SugarSync
+from datetime import date
 from Shift import Shift, load_shift_file, save_shift_file
 import time
 import json
@@ -132,6 +134,14 @@ try:
             # Log Config Read Write Time
             config_time = time.process_time()
             DL.logger.debug(f"[Config RW Time]: {(config_time - start_time):0.4f}s")
+            
+            DL.logger.info("Downloading the latest S&L file...")
+            sl_filename = SugarSync.download_dated_SL_file(date.today(), config["temp_dir"])
+            DL.logger.info(f"Downloaded: {sl_filename}")
+            
+            sl_time = time.process_time()
+            DL.logger.debug(f"[S&L Download Time]: {(sl_time - config_time):0.4f}s")
+            
 
             # Download all the files from the web then move it to /temp
             try: 
@@ -145,17 +155,20 @@ try:
                 DL.logger.exception(e)
             
             download_csv_time = time.process_time()
-            DL.logger.debug(f"[Download CSV Time]: {(download_csv_time - config_time):0.4f}s")
+            DL.logger.debug(f"[Download CSV Time]: {(download_csv_time - sl_time):0.4f}s")
         
             # Convert all the needed csv files in temp to a DCArray
             # Then create a Shift object with it
             try:
-                encapsulated_data = DRW.create_ecapsulated_data(config["temp_dir"], sales_labor_path)
+                encapsulated_data = DRW.create_ecapsulated_data(config["temp_dir"], config["temp_dir"])
                 
                 encapsulated_time = time.process_time()
                 DL.logger.debug(f"[Data Encapsulation Time]: {(encapsulated_time - download_csv_time):0.4f}s")
                 
                 curr_shift = Shift(encapsulated_data)
+                
+                if config['save_reports']:
+                    save_shift_file(curr_shift)
                 
                 encapsulated_read_time = time.process_time()
                 DL.logger.debug(f"[Encaped Data Read Time]: {(encapsulated_read_time - encapsulated_time):0.4f}s")
@@ -186,9 +199,6 @@ try:
                 print(curr_shift.get_sales_proj_vs_act_perc())
                 print(curr_shift.get_sales_proj_vs_act_labor())
                 print(curr_shift.get_present_job_title_count())
-                
-                if config['save_reports']:
-                    save_shift_file(curr_shift)
                 
             except Exception as e:
                 DL.logger.error("ERROR: Failed to print shift details! Exception:")
