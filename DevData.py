@@ -99,7 +99,7 @@ class DataCell:
         
         result = self.df.columns[self.col_index]
         
-        # Cycle thru cols if one isn't a number and isnlt "nan" then thats the new col_name
+        # Cycle thru cols if one isn't a number and isn't "nan" then thats the new col_name
         # The last string should be the closest string to the cell
         for val in cols:
             if self.__is_name_valid(str(val)):
@@ -138,7 +138,7 @@ class DataCell:
             self.df.to_csv(self.full_file_path, index=False)
             
         elif(self.file_ext == ".xlsx"):
-            # +2 and +1 are for the proper shift between openpyxl between pandas df
+            # +2 and +1 are for the proper shift between openpyxl and pandas df
             self.xl_sheet.cell(self.row_index + 2, self.col_index + 1).value = value
             self.xl_workbook.save(self.full_file_path)
         else:
@@ -164,26 +164,20 @@ class DCDictionary:
     '''
         This stands for DataCellDictionary
         
-        This takes in a df array and creates DataCell dictionary 
+        This takes in a Ndf array and creates a DataCell dictionary 
         and then offers helpful functions to read and write to any
         DataCell in the dictionary
     '''
         
     def __init__(self, Ndfs_arr: list):
-        self.DCArr = []
         self.Ndfs_arr = Ndfs_arr
         self.signature_dict = {}  # Dictionary to store lists of DataCells by signature
 
-        cum_dc_time = 0
         start_time = time.process_time()
         for Ndf in self.Ndfs_arr:
             for i in range(len(Ndf.dataframe.index)):
                 for j in range(len(Ndf.dataframe.columns)):
-                    dc_start_time = time.process_time_ns()
                     data_cell = DataCell(Ndf, i, j)
-                    dc_end_time = time.process_time_ns()
-                    cum_dc_time += (dc_end_time - dc_start_time)
-                    self.DCArr.append(data_cell)
 
                     # Add the DataCell to the dictionary indexed by its signature
                     if data_cell.signature not in self.signature_dict:
@@ -193,13 +187,13 @@ class DCDictionary:
         
         end_time = time.process_time()
         DL.logger.debug(f"[DC Dictionary Creation Time]: {(end_time - start_time):0.4f}s")
-        DL.logger.debug(f"[Avg Individual DC]: {((cum_dc_time / 100) / len(self.signature_dict)):0.4f}ms")
+
                         
     def size(self):
-        return len(self.DCArr)
+        return len(self.signature_dict)
                     
     def print(self):
-        for dc in self.DCArr:
+        for dc in self.signature_dict:
             dc.print()
             print("=================================")
         print(f"Total DataCells: {len(self.DCArr)}")
