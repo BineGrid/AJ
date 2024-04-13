@@ -116,8 +116,9 @@ def make_api_request(acc_token, url, method='GET', data=None):
     }
     
     # Make the API request
+    DL.logger.debug(f"AJ-Local: {method}")
     response = requests.request(method, url, headers=headers, json=data)
-    print("Response:", response)
+    DL.logger.debug(f"SugarSync-Cloud: {response}")
     
     # Check the response status code
     if response.status_code == 200:
@@ -197,7 +198,6 @@ def find_folder_url_xpath(x_path: str) -> str:
     
     for next_folder in ordered_folder_list:
         curr_folder_url = find_folder_in_url(curr_folder_url, next_folder).find('contents').text
-        print(f"Curr Folder: {next_folder}, URL: {curr_folder_url}")
     
     return curr_folder_url
 

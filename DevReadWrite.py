@@ -48,13 +48,18 @@ def __process_files_into_Ndf_arr(csv_path, sl_path):
             file_path = os.path.join(csv_path, filename)
             result_Ndf_arr.append(DD.NamedDataFrame(file_path, pd.read_csv(os.path.join(csv_path, filename))))
             files_found += 1
+    
+    for file_name in os.listdir(config["temp_dir"]):
+        if file_name.startswith("S&L"):
+            full_sl_path = os.path.join(sl_path, file_name)
+            print(f"Full S&L Path: {full_sl_path}")
 
-    xl_workbook = openpyxl.load_workbook(sl_path)
+    xl_workbook = openpyxl.load_workbook(full_sl_path)
     for sheet in ("S&L", "BoH Schedule", "FoH Schedule"):
-        df = pd.read_excel(sl_path, sheet_name=sheet)
+        df = pd.read_excel(full_sl_path, sheet_name=sheet)
         xl_sheet = xl_workbook[sheet]
         # Adds the content to the NDF_Arr
-        result_Ndf_arr.append(DD.NamedDataFrame(sl_path, df, xl_sheet, xl_workbook))
+        result_Ndf_arr.append(DD.NamedDataFrame(full_sl_path, df, xl_sheet, xl_workbook))
         files_found += 1 
 
     # + 3 for the 3 sheets in the excel S&L file

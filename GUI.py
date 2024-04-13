@@ -34,18 +34,10 @@ input_layout = [
     [sg.Checkbox("Delete Temp Files", key='delete'), sg.Push()],
     [sg.Checkbox("Save Reports", key='save'),sg.Push(),sg.Button('Payroll Tool', key="-PAY-")],
     [
-        sg.FolderBrowse(button_text="Dwnld Folder", enable_events=True, size=(10, 2)),
-        sg.InputText(config["download_dir"], key="-DLFOLDER_TEXT-", size=(98, 1)),
-    ],
-    [
-        sg.FileBrowse(button_text="S&L File", enable_events=True, size=(10, 2)),
-        sg.InputText(config["last_excel_path"], key="-EXCELFOLDER_TEXT-", size=(98, 1)),
-    ],
-    [
         sg.Button("Generate Report", size=(15, 3)), sg.Push(), 
         sg.Button(button_text="Load Old Report", size=(12, 2), key="-LOAD-")
     ],
-    [sg.Output(size=(110, 25), key="-OUTPUT-")]
+    [sg.Output(size=(config["gui_out_x"], config["gui_out_y"]), key="-OUTPUT-")]
 ]
 
 # ██████╗ ██╗   ██╗██╗    ██╗    ██╗██╗███╗   ██╗██████╗  ██████╗ ██╗    ██╗███████╗
@@ -61,7 +53,6 @@ curr_shift = None
 csv_arr = []
 
 # Load in default checkbox value from config
-sales_labor_path = config["last_excel_path"]
 download_path = config["download_dir"]
 
 # Update the gui elements with the old values from the config
@@ -125,8 +116,6 @@ try:
             
             # Update all the settings and file paths from the gui elements to the config
             DL.logger.info("\n   - Generating Report -")
-            config["download_dir"] = download_dir = values["-DLFOLDER_TEXT-"]
-            config["last_excel_path"] = sales_labor_path = values["-EXCELFOLDER_TEXT-"]
             config["save_reports"] = values["save"]
             config["delete_temp_files"] = values["delete"]
             DRW.write_config(config)
@@ -224,7 +213,7 @@ try:
 except Exception as e:
     DL.logger.exception(e)
     DL.logger.critical("-= Closing window in 20 seconds! =-")
-    time.sleep(2)
+    time.sleep(20)
 
 # Close the window just in case it gets stuck somehow
 window.close()
