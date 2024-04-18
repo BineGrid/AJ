@@ -1,5 +1,0 @@
-Payment type,Payment sub type,Taxes,Tips,Count,Refunds,Amount,Discounts,Grat,Tip refunds,Sales refunds,Legacy tips,Total,Tips/Grat %
-CASH,,0.0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.00,0.00,
-CREDIT,,0.0,0.0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.00,0.00,
-GIFTCARD,,0.0,0.0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.00,0.00,
-OTHER,,0.0,0.0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.00,0.00,
