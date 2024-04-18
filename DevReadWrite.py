@@ -1,10 +1,11 @@
-import json
+import Config
 import os
 from pathlib import Path
 import zipfile
 import DevLogger as DL
 import DevData as DD
 import openpyxl
+from Shift import Shift
 
 try:
     import pandas as pd
@@ -13,15 +14,12 @@ except ImportError as e:
     DL.logger.critical("Pandas doesn't seem to be installed. Please install it using 'pip install pandas'.")
     DL.logger.critical("Exception: ", e)
 
-with open('config.json') as f:
-  config = json.load(f)
+config = Config.config
 
-def write_config(conf):
-    '''
-        This updates the config with its new values
-    '''
-    with open('config.json', 'w') as f:
-        json.dump(conf, f, indent=4)
+def find_full_sl_path(dir: str):
+    for file_name in os.listdir(dir):
+        if file_name.startswith("S&L"):
+            return os.path.join(dir, file_name)
         
 def __process_files_into_Ndf_arr(csv_path, sl_path):
     '''
@@ -49,10 +47,7 @@ def __process_files_into_Ndf_arr(csv_path, sl_path):
             result_Ndf_arr.append(DD.NamedDataFrame(file_path, pd.read_csv(os.path.join(csv_path, filename))))
             files_found += 1
     
-    for file_name in os.listdir(config["temp_dir"]):
-        if file_name.startswith("S&L"):
-            full_sl_path = os.path.join(sl_path, file_name)
-            print(f"Full S&L Path: {full_sl_path}")
+    full_sl_path = find_full_sl_path(config["temp_dir"])
 
     xl_workbook = openpyxl.load_workbook(full_sl_path)
     for sheet in ("S&L", "BoH Schedule", "FoH Schedule"):
@@ -132,9 +127,52 @@ def unzip_sales_summary(dir: str, delete = config["delete_temp_files"]):
 def delete_everything_in_dir(dir: str):
     for file in os.listdir(dir):
         os.remove(os.path.join(dir, file))
+        
+def write_shift_into_sl(shift: Shift):
+    '''
+        Takes in the shift object and writes it to the S&L file within the shift object
+    '''
     
-#unzip_sales_summary(config["download_dir"])
-#rellocate_payroll_csv(config["download_dir"])
+    # Pass the real reference to the shift object
+    DCDict: DD.DCDictionary = shift.encaped_data
+    
+    # Get the currDay string
+    currDay = shift.currDay
+    today = ''
+    
+    # Convert Toast Currday to the S&L style days
+    match(currDay):
+        case 'Mon':
+            today = "Monday"
+        case 'Tue':
+            today = "Tuesday"
+        case 'Wed':
+            today = "Wednesday"
+        case 'Thu':
+            today = "Thursday"
+        case 'Fri':
+            today = "Friday"
+        case 'Sat':
+            today = "Saturday"
+        case 'Sun':
+            today = "Sunday"
+            
+    today = "Sunday"
+        
+    # write everything to the local S&L file
+    DCDict[f"S&L-SALES Bar/DR/Patio-{today}"].write((shift.netSales - shift.takeoutSales))
+    DCDict[f"S&L-SalesTakeout/Delivery-{today}"].write((shift.takeoutSales))
+    DCDict[f"S&L-Actual Daily Kitchen Hrs-{today}"].write((shift.ActBOHHours))
+    DCDict[f"S&L-Actual Daily Dining Room Hrs-{today}"].write((shift.ActFOHHours))
+    DCDict[f"S&L-Actual Daily Labor $ BOH-{today}"].write((shift.ActBOHLabor))
+    DCDict[f"S&L-Actual Daily Labor $ FOH-{today}"].write((shift.ActFOHLabor))
+    DCDict[f"S&L-Grubhub-{today}"].write((shift.grubhubSales))
+    DCDict[f"S&L-Doordash-{today}"].write((shift.doordashSales))
+    DCDict[f"S&L-Total SP $-{today}"].write((shift.totalDiscounts))
+    
+    
+    
+    
 
                         
             

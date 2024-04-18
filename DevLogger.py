@@ -1,8 +1,7 @@
-import json
+import Config
 import logging
 
-with open('config.json') as f:
-  config = json.load(f)
+config = Config.config
   
 # Create a custom handler that updates the text element in the GUI window
 class GUITextHandler(logging.StreamHandler):

@@ -1,4 +1,4 @@
-import json
+import Config
 from xml.dom.minidom import Element
 import requests
 import xml.etree.ElementTree as ET
@@ -8,8 +8,7 @@ import DevLogger as DL
 import os
 
 # Load configuration from JSON file
-with open('config.json') as f:
-    config = json.load(f)
+config = Config.config
     
     
 #   █████╗ ██╗   ██╗████████╗██╗  ██╗███████╗███╗   ██╗████████╗██╗ ██████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
@@ -18,7 +17,7 @@ with open('config.json') as f:
 #  ██╔══██║██║   ██║   ██║   ██╔══██║██╔══╝  ██║╚██╗██║   ██║   ██║██║     ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
 #  ██║  ██║╚██████╔╝   ██║   ██║  ██║███████╗██║ ╚████║   ██║   ██║╚██████╗██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
                                                      
-API_SAMPLE_USER_AGENT = "/Folders"
+API_USER_AGENT = "/Folders"
 APP_AUTH_REFRESH_TOKEN_API_URL = "https://api.sugarsync.com/app-authorization"
 
 def __get_refresh_token(username, password, application, access_key, private_access_key):
@@ -34,7 +33,7 @@ def __get_refresh_token(username, password, application, access_key, private_acc
 
     # Make a HTTP POST request to the app authorization API
     headers = {
-        "User-Agent": API_SAMPLE_USER_AGENT,
+        "User-Agent": API_USER_AGENT,
         "Content-Type": "application/xml"
     }
     response = requests.post(APP_AUTH_REFRESH_TOKEN_API_URL, headers=headers, data=request_payload)
@@ -85,8 +84,8 @@ def __get_access_token(acc_key, priv_key, ref_token):
     return access_token
 
 # --=== These are the authentication tokens ===--
-__refresh_token = __get_refresh_token(username, password, application, access_key, private_access_key)
-__access_token = __get_access_token(access_key, private_access_key, __refresh_token)
+__refresh_token = None
+__access_token = None
 # These are really important ^^^
 
 
@@ -103,11 +102,22 @@ __access_token = __get_access_token(access_key, private_access_key, __refresh_to
 #  ██║     ╚██████╔╝██║ ╚████║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
 #  ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
 
+def connect():
+    '''
+        Call this to generate the access tokens
+    '''
+    global __refresh_token, __access_token
+    
+    __refresh_token = __get_refresh_token(username, password, application, access_key, private_access_key)
+    __access_token = __get_access_token(access_key, private_access_key, __refresh_token)
+
 def make_api_request(acc_token, url, method='GET', data=None):
     '''
         Perform any basic http api request
         
         method defaults the 'GET'
+        
+        :file_size: is in bytes
     '''
     # Construct the request headers with the access token
     headers = {
@@ -117,7 +127,7 @@ def make_api_request(acc_token, url, method='GET', data=None):
     
     # Make the API request
     DL.logger.debug(f"AJ-Local: {method}")
-    response = requests.request(method, url, headers=headers, json=data)
+    response = requests.request(method, url, headers=headers, data=data)
     DL.logger.debug(f"SugarSync-Cloud: {response}")
     
     # Check the response status code
@@ -290,6 +300,16 @@ def find_dated_file_element(date: date, folder_url: str) -> Element:
         
      # If we find nothing return none
     return None
+
+def find_dated_sl_element(date: date) -> Element:
+    # Open the first dated folder
+    sl_folder_contents = find_dated_folder_element(date, find_folder_url_xpath("ADMIN/Sales and Labor")).find('contents').text
+
+    # Open the second dated folder
+    sl_folder_contents_2 = find_dated_folder_element(date, sl_folder_contents)
+
+    # Find the dated file within the second dated folder
+    return find_dated_file_element(date, sl_folder_contents_2.find('contents').text)
          
         
 #  ██████╗  ██████╗ ██╗    ██╗███╗   ██╗██╗      ██████╗  █████╗ ██████╗ 
@@ -323,17 +343,55 @@ def download_dated_SL_file(date: date, dir: str) -> str:
         
         Returns the downloaded filename 
     '''
-    # Open the first dated folder
-    sl_folder_contents = find_dated_folder_element(date, find_folder_url_xpath("ADMIN/Sales and Labor")).find('contents').text
-
-    # Open the second dated folder
-    sl_folder_contents_2 = find_dated_folder_element(date, sl_folder_contents)
-
-    # Find the dated file within the second dated folder
-    sl_element = find_dated_file_element(date, sl_folder_contents_2.find('contents').text)
+    # Finds the apropriate S&L file elements
+    sl_element = find_dated_sl_element(date)
     
     file_name = sl_element.find("displayName").text
     filedata_url = sl_element.find("fileData").text
     
     download_file(filedata_url, dir, file_name)
     return file_name
+
+
+#  ██╗   ██╗██████╗ ██╗      ██████╗  █████╗ ██████╗ 
+#  ██║   ██║██╔══██╗██║     ██╔═══██╗██╔══██╗██╔══██╗
+#  ██║   ██║██████╔╝██║     ██║   ██║███████║██║  ██║
+#  ██║   ██║██╔═══╝ ██║     ██║   ██║██╔══██║██║  ██║
+#  ╚██████╔╝██║     ███████╗╚██████╔╝██║  ██║██████╔╝
+#   ╚═════╝ ╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ 
+
+def upload_file(url, local_file_path):
+    """
+    Uploads a file using an HTTP PUT request.
+
+    Args:
+        url (str): The URL to which the file will be uploaded.
+        local_file_path (str): The path to the local file to be uploaded.
+        access_token (str): The access token for authentication.
+    """
+    # Define the headers for the request
+    headers = {
+        'Authorization': f'Bearer {__access_token}',
+        'User-Agent': API_USER_AGENT,
+        'Content-Type': 'application/octet-stream',
+    }
+
+    # Open the file in binary read mode
+    with open(local_file_path, 'rb') as file:
+        # Make the PUT request to upload the file
+        response = requests.put(url, headers=headers, data=file)
+
+    DL.logger.info(f"SugarSync-Cloud: {response}")
+    
+def upload_sl_file(date: date, file_path: str):
+    '''
+        Takes in a date for which S&L file to upload too
+        
+        Then uploads the file from the specific path, 
+        please provide the full file path
+    '''
+    sl_element = find_dated_sl_element(date)
+    
+    filedata_url = sl_element.find("fileData").text
+    
+    upload_file(filedata_url, file_path)

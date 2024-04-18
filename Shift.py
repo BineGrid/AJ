@@ -1,10 +1,9 @@
 from datetime import datetime
-import json
+import Config
 import pickle
 from DevData import *
 
-with open('config.json') as f:
-  config = json.load(f)
+config = Config.config
 
 class Shift:
     '''
@@ -13,7 +12,7 @@ class Shift:
     
     def __init__(self, encapsulated_data: DCDictionary):
         
-        self.encaped_data = encapsulated_data
+        self.encaped_data: DCDictionary = encapsulated_data
         
         # -= Misc =-
         self.currDay = encapsulated_data.read_by_sign("Day of week (totals)-Day of week")

@@ -1,6 +1,4 @@
-from math import nan
 import os
-import numpy as np
 from pandas import DataFrame as df
 from openpyxl import workbook
 import time
@@ -186,9 +184,16 @@ class DCDictionary:
                         self.signature_dict[data_cell.signature].append(data_cell)
         
         end_time = time.process_time()
-        DL.logger.debug(f"[DC Dictionary Creation Time]: {(end_time - start_time):0.4f}s")
+        DL.logger.debug(f"[DC Dictionary Creation Time]: {100 * (end_time - start_time):0.0f}ms")
+        
+    def __getitem__(self, sign: str) -> DataCell:
+        input_type = type(sign)
+        if input_type is str:
+            return self.get_dc_by_sign(sign)
+        else:
+            raise ValueError(f"Unsupported key for dictionary: \'{sign}\', Key must be a str")
 
-                        
+          
     def size(self):
         return len(self.signature_dict)
                     
@@ -198,11 +203,21 @@ class DCDictionary:
             print("=================================")
         print(f"Total DataCells: {len(self.DCArr)}")
                     
-    def get_dc_by_sign(self, sig: str):
+    def get_dc_by_sign(self, sig: str) -> DataCell | list[DataCell]:
         '''
             This returns an array of all the cells with the same signature
         '''
-        return self.signature_dict.get(sig, [])
+        data_cells = self.signature_dict.get(sig, [])
+        
+        # If there are no datacells return None
+        if len(data_cells) == 0:
+            return None
+        
+         # If there is only one datacell, just return the single cell instead of a list
+        elif len(data_cells) == 1:
+            return data_cells[0]
+        
+        return data_cells
     
     def read_by_sign(self, sig: str):
         '''
@@ -210,22 +225,22 @@ class DCDictionary:
             
             If a Datacell for that signature doesn't exist function returns 0
         '''
-        values = [val.read() for val in self.get_dc_by_sign(sig)]
+        datacells = self.get_dc_by_sign(sig)
         
-        numVals = len(values)
-        
-        # If we dont find a value just return 0
-        if numVals == 0: 
-            values = 0
-        # If its just a single value, remove the list property
-        elif numVals == 1:
-            values = values[0]
-        
-        return values
+        if datacells is None:
+            return 0
+        elif type(datacells) is list:
+            return [val.read() for val in datacells]
+        else:
+            return datacells.read()
     
     def write_by_sign(self, sig: str, val):
-            for dc in self.get_dc_by_sign(sig):
+        datacells = self.get_dc_by_sign(sig)
+        if type(datacells) is list:
+            for dc in datacells:
                 dc.write(val)
+        else:
+            datacells.write(val)
     
     def read_by_sign_sum_results(self, sig: str):
         '''

@@ -5,7 +5,7 @@
     This will deal with grabbing all the information from the Toast website
     & input information into shiftnote
 """
-import json
+import Config
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -17,8 +17,7 @@ import DevScreenControl as DSC
 from DevScreenControl import ShiftField as SF, ToastButton
 from Shift import Shift
 
-with open('config.json') as f:
-  config = json.load(f)
+config = Config.config
 
 # ██████╗██╗  ██╗██████╗  ██████╗ ███╗   ███╗███████╗                                 
 #██╔════╝██║  ██║██╔══██╗██╔═══██╗████╗ ████║██╔════╝                                 
