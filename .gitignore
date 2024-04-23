@@ -1,6 +1,9 @@
+*.spec
 *.json
 
 .vscode/
 __pycache__/
 temp/
 saved/
+build/
+dist/

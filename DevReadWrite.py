@@ -14,7 +14,7 @@ except ImportError as e:
     DL.logger.critical("Pandas doesn't seem to be installed. Please install it using 'pip install pandas'.")
     DL.logger.critical("Exception: ", e)
 
-config = Config.config
+config = Config.get_config()
 
 def find_full_sl_path(dir: str):
     for file_name in os.listdir(dir):
@@ -156,8 +156,6 @@ def write_shift_into_sl(shift: Shift):
             today = "Saturday"
         case 'Sun':
             today = "Sunday"
-            
-    today = "Sunday"
         
     # write everything to the local S&L file
     DCDict[f"S&L-SALES Bar/DR/Patio-{today}"].write((shift.netSales - shift.takeoutSales))

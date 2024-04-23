@@ -6,9 +6,10 @@ import re
 from datetime import date, datetime
 import DevLogger as DL
 import os
+from dateutil.relativedelta import relativedelta
 
 # Load configuration from JSON file
-config = Config.config
+config = Config.get_config()
     
     
 #   █████╗ ██╗   ██╗████████╗██╗  ██╗███████╗███╗   ██╗████████╗██╗ ██████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
@@ -220,6 +221,8 @@ def extract_folder_date(string: str):
         Month = None if no month is found in the folder name
     '''
     
+    DL.logger.debug("Inpecting Folder: " + string)
+    
     # Define regular expression patterns for matching month and year
     month_year_pattern = r'\b(\d{1,2}\.\d{4})\b'  # Matches month and year in format MM.YYYY
     year_pattern = r'\b(\d{4})\b'  # Matches only year in format YYYY
@@ -307,9 +310,23 @@ def find_dated_sl_element(date: date) -> Element:
 
     # Open the second dated folder
     sl_folder_contents_2 = find_dated_folder_element(date, sl_folder_contents)
+    
+    sl_element = find_dated_file_element(date, sl_folder_contents_2.find('contents').text)
+    
+    # If its not in the expected month folder check the next month in case there 
+    # is some overlap with the business 4-5 week months
+    if sl_element is None:
+        DL.logger.debug(f"Added One Month Date: {date + relativedelta(month=1)}")
+        sl_folder_contents_2 = find_dated_folder_element(date + relativedelta(months=1), sl_folder_contents)
+        sl_element = find_dated_file_element(date, sl_folder_contents_2.find('contents').text)
+        
+    if sl_element is None:
+        DL.logger.debug(f"Subtracted One Month Date: {date - relativedelta(month=1)}")
+        sl_folder_contents_2 = find_dated_folder_element(date - relativedelta(months=1), sl_folder_contents)
+        sl_element = find_dated_file_element(date, sl_folder_contents_2.find('contents').text)
 
     # Find the dated file within the second dated folder
-    return find_dated_file_element(date, sl_folder_contents_2.find('contents').text)
+    return sl_element
          
         
 #  ██████╗  ██████╗ ██╗    ██╗███╗   ██╗██╗      ██████╗  █████╗ ██████╗ 

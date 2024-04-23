@@ -31,7 +31,7 @@ class ShiftField:
 class ToastButton:
     CSV_Download = "DownloadCSVFiles.png"
 
-config = Config.config
+config = Config.get_config()
   
 # Function to scroll down until a specific color is found
 def find_image_move_until_color_found(image, color, x_move=0, y_move=0):

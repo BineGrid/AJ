@@ -3,7 +3,7 @@ import Config
 import pickle
 from DevData import *
 
-config = Config.config
+config = Config.get_config()
 
 class Shift:
     '''

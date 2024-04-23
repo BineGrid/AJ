@@ -16,8 +16,16 @@ from selenium.webdriver.common.action_chains import ActionChains
 import DevScreenControl as DSC
 from DevScreenControl import ShiftField as SF, ToastButton
 from Shift import Shift
+import DevLogger as DL
 
-config = Config.config
+try:
+    import PySimpleGUI as sg
+except ImportError as e:
+    sg = None
+    DL.logger.critical("PySimpleGUI doesn't seem to be installed properly.")
+    DL.logger.critical("Exception: ", e)
+
+config = Config.get_config()
 
 # ██████╗██╗  ██╗██████╗  ██████╗ ███╗   ███╗███████╗                                 
 #██╔════╝██║  ██║██╔══██╗██╔═══██╗████╗ ████║██╔════╝                                 
@@ -124,7 +132,7 @@ def switch_url(url:str):
     '''
     if driver.current_url != url:
         driver.execute_script("window.location.href = '" + url + "';")
-        time.sleep(config["DEFAULT_LOADING_WAIT"])
+        time.sleep(int(config["DEFAULT_LOADING_WAIT"]))
 
     
 def switch_tab_url(tab: Tabs, url: str):
@@ -175,7 +183,7 @@ class Toast:
             driver.execute_script(f"window.name = '{Tabs.TOAST}';")
         driver.get(config["TOAST_LOGIN_URL"])
         
-        wait = WebDriverWait(driver, config["DEFAULT_LOADING_WAIT"])
+        wait = WebDriverWait(driver, int(config["DEFAULT_LOADING_WAIT"]))
         userWait = WebDriverWait(driver, 60)
         
         # Wait a little longer for page to load
@@ -190,8 +198,7 @@ class Toast:
         # This checks if there is a captcha (sometimes there just isn't one, idk why)
         # If there is a captcha increase the wait time to account for the user pressing the captcha
         if (check_element_exists(By.ID, "ulp-recaptcha")):
-            # TODO Fix the captcha detection thingy
-            #AJGui.createPopUpMsg("Please press the im not a robot check box\nThen press continue", "Help!")
+            sg.createPopUpMsg("Please press the im not a robot check box\nThen press continue", "Help!")
             # Finds Password input
             passwd = userWait.until(
                 EC.presence_of_element_located((By.NAME, "password")))
@@ -212,7 +219,7 @@ class Toast:
         driver.find_element(By.ID, "dropdown-20").click()
         time.sleep(0.1)
         DSC.click_image(ToastButton.CSV_Download)
-        time.sleep(config["DEFAULT_DOWNLOAD_WAIT"])
+        time.sleep(int(config["DEFAULT_DOWNLOAD_WAIT"]))
         
     def download_payroll_export():
         '''
@@ -220,7 +227,7 @@ class Toast:
         '''
         switch_tab_url(Tabs.TOAST, config["TOASTLABOR_URL"])
         driver.find_element(By.ID, "payroll-export").click()
-        time.sleep(config["DEFAULT_DOWNLOAD_WAIT"])
+        time.sleep(int(config["DEFAULT_DOWNLOAD_WAIT"]))
         
     def download_everything(self):
         '''
@@ -252,7 +259,7 @@ class ShiftNote:
             driver.execute_script(f"window.name = '{Tabs.SHIFTNOTE}';")
         driver.get(config["SHIFTNOTE_LOGIN_URL"])
         
-        wait = WebDriverWait(driver, config["DEFAULT_LOADING_WAIT"])
+        wait = WebDriverWait(driver, int(config["DEFAULT_LOADING_WAIT"]))
         # Finds User input
         user = wait.until(EC.presence_of_element_located((By.NAME, "username")))
         user.send_keys(config["SHIFTUSER"])

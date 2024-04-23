@@ -1,7 +1,7 @@
 import Config
 import logging
 
-config = Config.config
+config = Config.get_config()
   
 # Create a custom handler that updates the text element in the GUI window
 class GUITextHandler(logging.StreamHandler):
