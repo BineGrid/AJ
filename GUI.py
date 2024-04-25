@@ -219,10 +219,10 @@ def open_input_window():
                 updated_shift = Shift(DCDictionary(loaded_shift.encaped_data.Ndfs_arr))
                 updated_shift.print_member_variables()
                 print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
-                print(updated_shift.get_hourly_report_str())
-                print(updated_shift.get_sales_proj_vs_act_perc())
-                print(updated_shift.get_sales_proj_vs_act_labor())
-                print(updated_shift.get_present_job_title_count())
+                print(updated_shift.create_hourly_report_str())
+                print(updated_shift.create_sales_proj_vs_act_perc())
+                print(updated_shift.create_sales_proj_vs_act_labor())
+                print(updated_shift.create_present_job_title_count())
                 
                 DL.logger.debug(f"[LOAD Time]: {(sg.timer_stop()):0.2f}ms")
                 sg.timer_start()
@@ -238,6 +238,11 @@ def open_input_window():
                 break
                 
             if event == "Start Auto Close":
+                
+                # Delete all files in temp if config says so
+                if config["delete_temp_files"]:
+                    DRW.delete_everything_in_dir(config["temp_dir"])
+                
                 sg.timer_start()
                 
                 # Update all the settings and file paths from the gui elements to the config
@@ -290,22 +295,33 @@ def open_input_window():
                     DL.logger.debug(f"[Report Save Time]: {sg.timer_stop()}ms")
                     
                     # Prompt the user to check if the info is correct before inputting it
-                    info = curr_shift.get_hourly_report_str() + "\n" + curr_shift.get_sales_proj_vs_act_labor() + "\n" + curr_shift.get_sales_proj_vs_act_perc() + "\n" + curr_shift.get_present_job_title_count()
-                    ans: str = sg.popup_yes_no("Is this information correct?\n\n" + info, title="Double Check")
-                    
-                    DL.logger.debug(f"Double Check Answer: {ans}")
-                    
-                    if ans.lower() == "no":
-                        sg.popup_ok("Please check that everyone is clocked out and try again")
+                    info = curr_shift.hourly_report_str + "\n" + curr_shift.sales_proj_vs_act_labor + "\n" + curr_shift.sales_proj_vs_act_perc + "\n" + curr_shift.present_job_title_count
+                    ans: str = sg.popup_get_text("Is this information correct?\n", title="Double Check", default_text=info, size=(60, 25))
                     
                     sg.timer_start()
                     
-                    if ans.lower() == "yes":
-                        # Write data into the temp S&L then upload tmep S&L to SugarSync
+                    if not(ans.lower() == "cancel"):
+                        inputed_shift_strs = ans.split("\n\n")
+                        
+                        curr_shift.hourly_report_str = inputed_shift_strs[0]
+                        curr_shift.sales_proj_vs_act_labor = inputed_shift_strs[1]
+                        curr_shift.sales_proj_vs_act_perc = inputed_shift_strs[2]
+                        curr_shift.present_job_title_count = inputed_shift_strs[3] 
+                        
+                        # Write data into the temp S&L then upload tepp S&L to SugarSync
                         DRW.write_shift_into_sl(curr_shift)
                         SugarSync.upload_sl_file(date.today(), DRW.find_full_sl_path(config["temp_dir"]))
                         
                         DL.logger.debug(f"[SugarSync Upload Time]: {sg.timer_stop()}ms")
+                        sg.timer_start()
+                        
+                        try:
+                            Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
+                        except Exception as e:
+                            DL.logger.error("ERROR:nan Failed to input shift into ShiftNote")
+                            DL.logger.exception(e)
+                        
+                    DL.logger.debug(f"[Enter ShiftNote Time]: {sg.timer_stop()}ms")
                     sg.timer_start()
                     
                     # Delete all files in temp if config says so
@@ -315,25 +331,11 @@ def open_input_window():
                 except Exception as e:
                     DL.logger.error("ERROR: Failed to read CSV files")
                     DL.logger.exception(e)
-                
-                if ans.lower() == "yes":
-                # Enter all the info into Shiftnote
-                    try:
-                        Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
-                    except Exception as e:
-                        DL.logger.error("ERROR: Failed to input shift into ShiftNote")
-                        DL.logger.exception(e)
-                        
-                    DL.logger.debug(f"[Enter ShiftNote Time]: {sg.timer_stop()}ms")
-                    sg.timer_start()
+
                     
                 # Print all the data because its cool
                 try:
                     curr_shift.print_member_variables()
-                    print(curr_shift.get_hourly_report_str())
-                    print(curr_shift.get_sales_proj_vs_act_perc())
-                    print(curr_shift.get_sales_proj_vs_act_labor())
-                    print(curr_shift.get_present_job_title_count())
                     
                 except Exception as e:
                     DL.logger.error("ERROR: Failed to print shift details! Exception:")

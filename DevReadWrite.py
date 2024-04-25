@@ -166,7 +166,7 @@ def write_shift_into_sl(shift: Shift):
     DCDict[f"S&L-Actual Daily Labor $ FOH-{today}"].write((shift.ActFOHLabor))
     DCDict[f"S&L-Grubhub-{today}"].write((shift.grubhubSales))
     DCDict[f"S&L-Doordash-{today}"].write((shift.doordashSales))
-    DCDict[f"S&L-Total SP $-{today}"].write((shift.totalDiscounts))
+    #DCDict[f"S&L-Total SP $-{today}"].write((shift.totalDiscounts))
     
     
     

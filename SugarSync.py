@@ -316,12 +316,10 @@ def find_dated_sl_element(date: date) -> Element:
     # If its not in the expected month folder check the next month in case there 
     # is some overlap with the business 4-5 week months
     if sl_element is None:
-        DL.logger.debug(f"Added One Month Date: {date + relativedelta(month=1)}")
         sl_folder_contents_2 = find_dated_folder_element(date + relativedelta(months=1), sl_folder_contents)
         sl_element = find_dated_file_element(date, sl_folder_contents_2.find('contents').text)
         
     if sl_element is None:
-        DL.logger.debug(f"Subtracted One Month Date: {date - relativedelta(month=1)}")
         sl_folder_contents_2 = find_dated_folder_element(date - relativedelta(months=1), sl_folder_contents)
         sl_element = find_dated_file_element(date, sl_folder_contents_2.find('contents').text)
 

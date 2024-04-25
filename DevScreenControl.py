@@ -30,6 +30,7 @@ class ShiftField:
         
 class ToastButton:
     CSV_Download = "DownloadCSVFiles.png"
+    Stupid_Blue_Window_Close = "BlueWindowClose.png"
 
 config = Config.get_config()
   

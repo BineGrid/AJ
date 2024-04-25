@@ -29,7 +29,7 @@ class Shift:
         self.grubhubSales = encapsulated_data.read_by_sign("Payments summary-Grubhub-Amount")
         self.foodSales = encapsulated_data.read_by_sign("Sales category summary-Food-Net sales")
         self.barSales = round(self.netSales - self.foodSales, 2)
-        self.totalDiscounts = encapsulated_data.read_by_sign("Discount summary-Amount")
+        self.totalDiscounts = encapsulated_data.read_by_sign("Menu Item Discounts-Total-Amount")
         
         # -= Labor =-
         self.ProjBOHHours = encapsulated_data.read_by_sign(f"S&L-Total Kitchen Hours-{self.currDay.upper()}")
@@ -99,6 +99,11 @@ class Shift:
 
         self.ActFOHLaborPerc = round((self.ActFOHLabor / self.netSales), 4)
         self.ActBOHLaborPerc = round((self.ActBOHLabor / self.netSales), 4)
+        
+        self.hourly_report_str = self.create_hourly_report_str()
+        self.sales_proj_vs_act_perc = self.create_sales_proj_vs_act_perc()
+        self.sales_proj_vs_act_labor = self.create_sales_proj_vs_act_labor()
+        self.present_job_title_count = self.create_present_job_title_count()
 
     def print_member_variables(self):
         '''
@@ -106,8 +111,15 @@ class Shift:
         '''
         for var_name, var_value in vars(self).items():
             print(f"{var_name}: {var_value}")
-                
-    def get_hourly_report_str(self) -> str:
+
+# ██████╗██████╗ ███████╗ █████╗ ████████╗ ██████╗ ██████╗ ███████╗
+#██╔════╝██╔══██╗██╔════╝██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗██╔════╝
+#██║     ██████╔╝█████╗  ███████║   ██║   ██║   ██║██████╔╝███████╗
+#██║     ██╔══██╗██╔══╝  ██╔══██║   ██║   ██║   ██║██╔══██╗╚════██║
+#╚██████╗██║  ██║███████╗██║  ██║   ██║   ╚██████╔╝██║  ██║███████║
+# ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝
+      
+    def create_hourly_report_str(self) -> str:
         '''
             The returns the Hour: Sales,Orders,Guest
             
@@ -116,7 +128,7 @@ class Shift:
             5-6: $1300.00, 13 orders, 13 guests
             ...
         '''
-        result_string = "\n"
+        result_string = ""
         
         # This puts every col into a list
         hours = (self.encaped_data.read_by_sign("Time of day (totals)-Hour of day"))
@@ -134,7 +146,7 @@ class Shift:
             
         return result_string
     
-    def get_sales_proj_vs_act_perc(self) -> str:
+    def create_sales_proj_vs_act_perc(self) -> str:
         '''
             This:\n
             Sales Forecasted = $ Sales Actual = $ = $\n
@@ -159,7 +171,7 @@ class Shift:
         
         return result_string
     
-    def get_sales_proj_vs_act_labor(self) -> str:
+    def create_sales_proj_vs_act_labor(self) -> str:
         '''
             This:\n
             FOH P: $ A: $\n
@@ -170,7 +182,7 @@ class Shift:
         
         return result_string
     
-    def get_present_job_title_count(self) -> str:
+    def create_present_job_title_count(self) -> str:
         '''
             This:\n
                 Bar 1/X Perfect\n
@@ -186,6 +198,13 @@ class Shift:
             result_string += f"{job} {count}/X Perfect\n"
         
         return result_string
+
+#███████╗ █████╗ ██╗   ██╗███████╗    ██╗██╗      ██████╗  █████╗ ██████╗ 
+#██╔════╝██╔══██╗██║   ██║██╔════╝   ██╔╝██║     ██╔═══██╗██╔══██╗██╔══██╗
+#███████╗███████║██║   ██║█████╗    ██╔╝ ██║     ██║   ██║███████║██║  ██║
+#╚════██║██╔══██║╚██╗ ██╔╝██╔══╝   ██╔╝  ██║     ██║   ██║██╔══██║██║  ██║
+#███████║██║  ██║ ╚████╔╝ ███████╗██╔╝   ███████╗╚██████╔╝██║  ██║██████╔╝
+#╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝    ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ 
 
 def save_shift_file(shift: Shift):
     '''

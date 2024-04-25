@@ -214,11 +214,15 @@ class Toast:
         '''
             Switch to the payment summary url on the toast tab and download all the csv files
         '''
-        switch_tab_url(Tabs.TOAST, config["TOASTHOME_URL"])
+        # Idk but sometimes it goes to the home screen for the first load
+        # So I do this twice just to be safe
         switch_tab_url(Tabs.TOAST, config["TOASTSALES_URL"])
+        switch_tab_url(Tabs.TOAST, config["TOASTSALES_URL"])
+        DSC.click_image(ToastButton.Stupid_Blue_Window_Close)
         driver.find_element(By.ID, "dropdown-20").click()
         time.sleep(0.1)
         DSC.click_image(ToastButton.CSV_Download)
+        time.sleep(0.1)
         time.sleep(int(config["DEFAULT_DOWNLOAD_WAIT"]))
         
     def download_payroll_export():
@@ -285,7 +289,7 @@ class ShiftNote:
         if angel_share is not None:
             DSC.enter_shiftnote_field(SF.Numeric.Angel_Share, angel_share)
             
-        #driver.find_element(By.ID, "submit1").click()
+        driver.find_element(By.ID, "submit1").click()
             
     def enter_labor(FOH_P, FOH_A, BOH_P, BOH_A):
         scroll_to_element(By.ID, config["SHIFT_SALES_LABOR_ID"])
@@ -293,23 +297,23 @@ class ShiftNote:
         DSC.enter_shiftnote_field(SF.Numeric.BOH_Lab_Act, BOH_A)
         DSC.enter_shiftnote_field(SF.Numeric.FOH_Lab_For, FOH_P)
         DSC.enter_shiftnote_field(SF.Numeric.FOH_Lab_Act, FOH_A)
-        #driver.find_element(By.ID, "submit1").click()
+        driver.find_element(By.ID, "submit1").click()
         
     def enter_sales_labor(text: str):
         scroll_to_element(By.ID, config["SHIFT_MARKETING_ID"])
         DSC.enter_shiftnote_field(SF.Input.Sales_and_Lab, text)
-        #driver.find_element(By.ID, "savebtn").click()
+        driver.find_element(By.ID, "savebtn").click()
         
     def enter_business_flow(text: str):
         scroll_to_element(By.ID, config["SHIFT_BUSINESS_FLOW_ID"])
         DSC.enter_shiftnote_field(SF.Input.Business_Flow, text)
-        #driver.find_element(By.ID, "savebtn").click()
+        driver.find_element(By.ID, "savebtn").click()
         
     def enter_staffing_levels(text: str):
         scroll_to_element(By.ID, config["SHIFT_IMMEDIATE_STAFFING_ID"])
         DSC.enter_shiftnote_field(SF.Input.Staffing_Levels, text)
         scroll_to_element(By.ID, config["SHIFT_IMMEDIATE_STAFFING_ID"])
-        #driver.find_element(By.ID, "savebtn").click()
+        driver.find_element(By.ID, "savebtn").click()
         
     def enter_shift(self, shift: Shift):
         '''
@@ -319,6 +323,8 @@ class ShiftNote:
         bring_to_front()
         self.enter_daily(str(shift.netSales), str(shift.ProjSales), str(shift.guestCount), str(shift.takeoutSales))
         self.enter_labor(str(shift.ProjFOHLabor), str(shift.ActFOHLabor), str(shift.ProjBOHLabor), str(shift.ActBOHLabor))
-        self.enter_sales_labor(shift.get_sales_proj_vs_act_perc())
+        self.enter_sales_labor(shift.sales_proj_vs_act_perc)
+        self.enter_business_flow(shift.hourly_report_str)
+        self.enter_staffing_levels(shift.present_job_title_count)
 
 
