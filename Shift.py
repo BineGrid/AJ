@@ -20,6 +20,7 @@ class Shift:
         
         # -= Sales =-
         self.ProjSales = encapsulated_data.read_by_sign(f"S&L-NET Sales Projection-{self.currDay.upper()}")
+        
         if isinstance(self.ProjSales, list):
             self.ProjSales = self.ProjSales[0] # We always get two of these, but I only want one lol
             

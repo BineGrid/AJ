@@ -1,4 +1,5 @@
-from DevData import DCDictionary
+from typing import Any
+from DevData import DCDictionary, DataCell
 import SugarSync
 from datetime import date
 from Shift import Shift, load_shift_file, save_shift_file
@@ -206,26 +207,30 @@ def open_input_window():
             event, values = window.read()
             
             if event == "-LOAD-":
-                DL.logger.info("\n\n   - Loading Report -")
-                # Find the .shift file and load it in as a Shift class
-                load_path = sg.popup_get_file('Pick a saved shift to load', initial_folder=config["saved_reports_dir"], file_types=[("Shift Files","*.shift")])
-                loaded_shift = load_shift_file(load_path)
-                
-                # Start timer after human input
-                sg.timer_start()
-                
-                # print loaded shift
-                # This allows for older shift files to still be backwards compatible
-                updated_shift = Shift(DCDictionary(loaded_shift.encaped_data.Ndfs_arr))
-                updated_shift.print_member_variables()
-                print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
-                print(updated_shift.create_hourly_report_str())
-                print(updated_shift.create_sales_proj_vs_act_perc())
-                print(updated_shift.create_sales_proj_vs_act_labor())
-                print(updated_shift.create_present_job_title_count())
-                
-                DL.logger.debug(f"[LOAD Time]: {(sg.timer_stop()):0.2f}ms")
-                sg.timer_start()
+                try:
+                    DL.logger.info("\n\n   - Loading Report -")
+                    # Find the .shift file and load it in as a Shift class
+                    load_path = sg.popup_get_file('Pick a saved shift to load', initial_folder=config["saved_reports_dir"], file_types=[("Shift Files","*.shift")])
+                    loaded_shift = load_shift_file(load_path)
+                    
+                    # Start timer after human input
+                    sg.timer_start()
+                    
+                    # print loaded shift
+                    # This allows for older shift files to still be backwards compatible
+                    updated_shift = Shift(DCDictionary(loaded_shift.encaped_data.Ndfs_arr))
+                    updated_shift.print_member_variables()
+                    print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+                    print(updated_shift.create_hourly_report_str())
+                    print(updated_shift.create_sales_proj_vs_act_perc())
+                    print(updated_shift.create_sales_proj_vs_act_labor())
+                    print(updated_shift.create_present_job_title_count())
+                    
+                    DL.logger.debug(f"[LOAD Time]: {(sg.timer_stop()):0.2f}ms")
+                    
+                except Exception as e:
+                    DL.logger.critical("ERROR: Failed to load shift!")
+                    DL.logger.exception(e)
                 
             if event == "settings":
                 window.close()
@@ -252,33 +257,45 @@ def open_input_window():
                 
                 # Log Config Read Write Time
                 DL.logger.debug(f"[Config RW Time]: {sg.timer_stop()}ms")
-                sg.timer_start()
                 
-                DL.logger.info("Downloading the latest S&L file...")
-                SugarSync.connect()
-                sl_filename = SugarSync.download_dated_SL_file(date.today(), config["temp_dir"])
-                DL.logger.info(f"Downloaded: {sl_filename}")
-                
-                DL.logger.debug(f"[S&L Download Time]: {sg.timer_stop()}ms")
-                sg.timer_start()
+                try:
+                    sg.timer_start()
+                    
+                    DL.logger.info("Downloading the latest S&L file...")
+                    SugarSync.connect()
+                    sl_filename = SugarSync.download_dated_SL_file(date.today(), config["temp_dir"])
+                    DL.logger.info(f"Downloaded: {sl_filename}")
+                    
+                    DL.logger.debug(f"[S&L Download Time]: {sg.timer_stop()}ms")
+                    
+                    # Double check that the S&L is correct otherwise cancel
+                    response: str = sg.popup_yes_no(f"Is this S&L Correct: {sl_filename}")
+                    
+                    if response.lower() == "no":
+                        continue
+                    
+                except Exception as e:
+                    DL.logger.critical("ERROR: Failed to download the latest S&L file!")
+                    DL.logger.exception(e)
                 
                 # Download all the files from the web then move it to /temp
                 try: 
+                    sg.timer_start()
                     Web.init_chrome()
                     Web.Toast.download_sales_summary()
                     DRW.unzip_sales_summary(config["download_dir"])
                     Web.Toast.download_payroll_export()
                     DRW.rellocate_payroll_csv(config["download_dir"])
+                    
+                    DL.logger.debug(f"[Download CSV Time]: {sg.timer_stop()}ms")
                 except Exception as e:
                     DL.logger.critical("ERROR: Failed to download the csv files from toast!")
                     DL.logger.exception(e)
                 
-                DL.logger.debug(f"[Download CSV Time]: {sg.timer_stop()}ms")
-                sg.timer_start()
-            
                 # Convert all the needed csv files in temp to a DCArray
                 # Then create a Shift object with it
                 try:
+                    sg.timer_start()
                     encapsulated_data = DRW.create_ecapsulated_data(config["temp_dir"], config["temp_dir"])
                     
                     DL.logger.debug(f"[Data Encapsulation Time]: {sg.timer_stop}ms")
@@ -287,22 +304,37 @@ def open_input_window():
                     curr_shift: Shift = Shift(encapsulated_data)
                     
                     DL.logger.debug(f"[Encaped Data Read Time]: {sg.timer_stop()}ms")
+                    
+                except Exception as e:
+                    DL.logger.error("ERROR: Failed to read CSV files")
+                    DL.logger.exception(e)
+                    
+                try:
                     sg.timer_start()
             
                     if config['save_reports']:
                         save_shift_file(curr_shift)
                         
                     DL.logger.debug(f"[Report Save Time]: {sg.timer_stop()}ms")
+                except Exception as e:
+                    DL.logger.error("ERROR: Failed to save shift file")
+                    DL.logger.exception(e)
                     
+                try:
                     # Prompt the user to check if the info is correct before inputting it
                     info = curr_shift.hourly_report_str + "\n" + curr_shift.sales_proj_vs_act_labor + "\n" + curr_shift.sales_proj_vs_act_perc + "\n" + curr_shift.present_job_title_count
                     ans: str = sg.popup_get_text("Is this information correct?\n", title="Double Check", default_text=info, size=(60, 25))
+                except Exception as e:
+                    DL.logger.error("ERROR: Failed to edit shift details")
+                    DL.logger.exception(e)
                     
-                    sg.timer_start()
+                sg.timer_start()
                     
-                    if not(ans.lower() == "cancel"):
-                        inputed_shift_strs = ans.split("\n\n")
+                if ans is not None:
                         
+                    try:
+                        inputed_shift_strs = ans.split("\n\n")
+                            
                         curr_shift.hourly_report_str = inputed_shift_strs[0]
                         curr_shift.sales_proj_vs_act_labor = inputed_shift_strs[1]
                         curr_shift.sales_proj_vs_act_perc = inputed_shift_strs[2]
@@ -311,15 +343,19 @@ def open_input_window():
                         # Write data into the temp S&L then upload tepp S&L to SugarSync
                         DRW.write_shift_into_sl(curr_shift)
                         SugarSync.upload_sl_file(date.today(), DRW.find_full_sl_path(config["temp_dir"]))
-                        
+                            
                         DL.logger.debug(f"[SugarSync Upload Time]: {sg.timer_stop()}ms")
-                        sg.timer_start()
+                            
+                    except Exception as e:
+                        DL.logger.error("ERROR: Failed to write and upload new S&L")
+                        DL.logger.exception(e)
                         
-                        try:
-                            Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
-                        except Exception as e:
-                            DL.logger.error("ERROR:nan Failed to input shift into ShiftNote")
-                            DL.logger.exception(e)
+                    try:
+                        sg.timer_start()
+                        Web.ShiftNote.enter_shift(Web.ShiftNote, curr_shift)
+                    except Exception as e:
+                        DL.logger.error("ERROR: Failed to input shift into ShiftNote")
+                        DL.logger.exception(e)
                         
                     DL.logger.debug(f"[Enter ShiftNote Time]: {sg.timer_stop()}ms")
                     sg.timer_start()
@@ -327,11 +363,6 @@ def open_input_window():
                     # Delete all files in temp if config says so
                     if config["delete_temp_files"]:
                         DRW.delete_everything_in_dir(config["temp_dir"])
-                        
-                except Exception as e:
-                    DL.logger.error("ERROR: Failed to read CSV files")
-                    DL.logger.exception(e)
-
                     
                 # Print all the data because its cool
                 try:
@@ -386,5 +417,66 @@ def open_paytool_window():
         if event == sg.WIN_CLOSED:
             break
     
+    
+#██████╗  █████╗ ████████╗ █████╗     ████████╗ ██████╗  ██████╗ ██╗     
+#██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗    ╚══██╔══╝██╔═══██╗██╔═══██╗██║     
+#██║  ██║███████║   ██║   ███████║       ██║   ██║   ██║██║   ██║██║     
+#██║  ██║██╔══██║   ██║   ██╔══██║       ██║   ██║   ██║██║   ██║██║     
+#██████╔╝██║  ██║   ██║   ██║  ██║       ██║   ╚██████╔╝╚██████╔╝███████╗
+#╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝
+
+def open_data_viewer_window():
+    
+    start_layout = [
+        [sg.Push(), sg.Text("DC-Dictionary Debug Tool ", font=("Arial", 18)), sg.Push()],
+        [sg.Push(), sg.Input(size=(25, 1), k="-LOADPATH-"), sg.Button("Load Saved Shift", k="-LOAD-"), sg.Push()],
+        [sg.Text()],
+        [sg.Push(), sg.Text("Signature: "), sg.Input(size=(50, 1)), sg.Button("Search by Sign"), sg.Push()]
+    ]
+    
+    window = sg.Window('DC-Dictionary Debug Tool', start_layout, size=(1400, 1200), icon='AJ.ico')
+    
+    while True:
+        event, values = window.read()
+        
+        if event == "Cancel":
+            window.close()
+            open_input_window()
+            break
+        
+        if event == "-LOAD-":  
+            try:
+                # Find the .shift file and load it in as a Shift class
+                load_path = sg.popup_get_file('Pick a saved shift to load', initial_folder=config["saved_reports_dir"], file_types=[("Shift Files","*.shift")])
+                window['-LOADPATH-'].update(os.path.basename(load_path))
+                loaded_shift = load_shift_file(load_path)
+                    
+                encaped_data = loaded_shift.encaped_data
+                    
+                window.start_thread(lambda: process_datacells_thread(window, encaped_data), ('-THREAD-', '-THEAD ENDED-'))  
+            except Exception as e:
+                DL.logger.critical("ERROR: Failed to load shift for DC Debug tool!")
+                DL.logger.exception(e)
+        
+        if event == sg.WIN_CLOSED:
+            break
+        
+def create_datacell_layout(dc: DataCell) -> list:
+    '''
+        Takes in a DataCell and creates a layout that shows all in the info for that DC
+    '''
+    new_layout = [
+        [sg.Text("File: "), sg.Text(dc.file_name)],
+        [sg.Text("Sign: "), sg.Text(dc.signature)],
+        [sg.Text("Val: "), sg.Text(dc.read())]
+    ]
+    
+    return new_layout
+
+def process_datacells_thread(window, DCDict: DCDictionary):
+    pass
+    
+        
+
 if __name__ == "__main__":
     open_start_window()
