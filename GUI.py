@@ -32,11 +32,14 @@ def open_start_window():
     
     start_layout = [
         [
-            sg.Button('Payroll Buddy', key="-PAY-"), sg.Push(), sg.Text("Welcome to ", font=("Georgia", 20, 'bold')),
-            sg.Text("AJ", font=("Impact", 28), text_color="gold"), sg.Push(), sg.Button("Config.json")
+         sg.Button('Payroll Buddy', key="-PAY-"), sg.Push(), sg.Text("Welcome to ", font=("Georgia", 20, 'bold')),
+         sg.Text("AJ", font=("Impact", 28), text_color="gold"), sg.Push(), sg.Button("Config.json")
         ],
         [sg.Push(), sg.Text("Please select a tool", font=("Georgia", 14, 'bold')), sg.Push()],
-        [sg.Button("Auto Closer", size=(12, 2)), sg.Push(), sg.Button("⚙ Settings", key="settings", size=(12, 2))]]
+        [
+         sg.Button("Auto Closer", size=(12, 2)), sg.Push(), sg.Text("Beta Version", font=("Georgia", 7, 'bold')),
+         sg.Push(), sg.Button("⚙ Settings", key="settings", size=(12, 2))
+        ]]
     
     window = sg.Window('Starting Window', start_layout, size=(config["gui_start_x"], config["gui_start_y"]), icon='AJ.ico')
 
@@ -475,8 +478,9 @@ def create_datacell_layout(dc: DataCell) -> list:
 
 def process_datacells_thread(window, DCDict: DCDictionary):
     pass
-    
-        
+
+
 
 if __name__ == "__main__":
     open_start_window()
+    #open_data_viewer_window()

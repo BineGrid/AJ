@@ -219,10 +219,9 @@ class Toast:
         switch_tab_url(Tabs.TOAST, config["TOASTSALES_URL"])
         switch_tab_url(Tabs.TOAST, config["TOASTSALES_URL"])
         DSC.click_image(ToastButton.Stupid_Blue_Window_Close)
-        driver.find_element(By.ID, "dropdown-20").click()
-        time.sleep(0.1)
+        driver.find_element(By.ID, "dropdown-21").click()
+        time.sleep(0.5)
         DSC.click_image(ToastButton.CSV_Download)
-        time.sleep(0.1)
         time.sleep(int(config["DEFAULT_DOWNLOAD_WAIT"]))
         
     def download_payroll_export():

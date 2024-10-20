@@ -16,13 +16,29 @@ class Shift:
         
         # -= Misc =-
         self.currDay = encapsulated_data.read_by_sign("Day of week (totals)-Day of week")
+        self.SLCurrDay = "none"
+        
+        # Convert Toast Currday to the S&L style days
+        match(self.currDay):
+            case 'Mon':
+                self.SLCurrDay = "Monday"
+            case 'Tue':
+                self.SLCurrDay = "Tuesday"
+            case 'Wed':
+                self.SLCurrDay = "Wednesday"
+            case 'Thu':
+                self.SLCurrDay = "Thursday"
+            case 'Fri':
+                self.SLCurrDay = "Friday"
+            case 'Sat':
+                self.SLCurrDay = "Saturday"
+            case 'Sun':
+                self.SLCurrDay = "Sunday"
+        
         self.guestCount = encapsulated_data.read_by_sign(f"Day of week (totals)-{self.currDay}-Total guests")
         
         # -= Sales =-
-        self.ProjSales = encapsulated_data.read_by_sign(f"S&L-NET Sales Projection-{self.currDay.upper()}")
-        
-        if isinstance(self.ProjSales, list):
-            self.ProjSales = self.ProjSales[0] # We always get two of these, but I only want one lol
+        self.ProjSales = encapsulated_data.read_by_sign(f"S&L-Projected Sales-{self.SLCurrDay}")
             
         self.netSales = encapsulated_data.read_by_sign(f"Day of week (totals)-{self.currDay}-Net sales")
         self.takeoutSales = encapsulated_data.read_by_sign("Revenue center summary-Take Out-Net sales")
@@ -33,11 +49,17 @@ class Shift:
         self.totalDiscounts = encapsulated_data.read_by_sign("Menu Item Discounts-Total-Amount")
         
         # -= Labor =-
-        self.ProjBOHHours = encapsulated_data.read_by_sign(f"S&L-Total Kitchen Hours-{self.currDay.upper()}")
+        if self.currDay.upper() == "THU":
+            self.ProjBOHHours = encapsulated_data.read_by_sign(f"S&L-Total Kitchen Hours-THUR")
+            self.ProjBOHLabor = encapsulated_data.read_by_sign(f"S&L-Total Kitchen Labor Cost-THUR")
+            self.ProjBOHLaborPerc = round(encapsulated_data.read_by_sign(f"S&L-Total BOH Labor %-THUR"), 4)
+        else:
+            self.ProjBOHHours = encapsulated_data.read_by_sign(f"S&L-Total Kitchen Hours-{self.currDay.upper()}")
+            self.ProjBOHLabor = encapsulated_data.read_by_sign(f"S&L-Total Kitchen Labor Cost-{self.currDay.upper()}")
+            self.ProjBOHLaborPerc = round(encapsulated_data.read_by_sign(f"S&L-Total BOH Labor %-{self.currDay.upper()}"), 4)
+                
         self.ProjFOHHours = encapsulated_data.read_by_sign(f"S&L-Total Front House Hours-{self.currDay.upper()}")
-        self.ProjBOHLabor = encapsulated_data.read_by_sign(f"S&L-Total Kitchen Labor Cost-{self.currDay.upper()}")
         self.ProjFOHLabor = encapsulated_data.read_by_sign(f"S&L-Total Front Louse Cost-{self.currDay.upper()}")
-        self.ProjBOHLaborPerc = round(encapsulated_data.read_by_sign(f"S&L-Total BOH Labor %-{self.currDay.upper()}"), 4)
         self.ProjFOHLaborPerc = round(encapsulated_data.read_by_sign(f"S&L-Total Front House %-{self.currDay.upper()}"), 4)
         
         # Grabs the names of all the respective Job titles from the config
